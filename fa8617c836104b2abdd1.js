@@ -14364,8 +14364,8 @@
 	var Elm = __webpack_require__(1);
 	var mountNode = document.getElementById('app');
 	var app = Elm.Main.embed(mountNode, {
-	  buildVersion: ("13d5165e0bbb6d3f73fb615f8f18517794e9842a\n"),
-	  buildTime: ("2017-04-18T22:30:29.939Z"),
+	  buildVersion: ("17190ea3a4a23055e1b7ab825a87c28bc3207a8a\n"),
+	  buildTime: ("2017-04-18T22:43:53.815Z"),
 	  buildTier: ("production"),
 	  apiHost: ("https://asana-inbox.herokuapp.com"),
 	});
