@@ -11744,7 +11744,11 @@
 											return function (k) {
 												return function (l) {
 													return function (m) {
-														return {apiHost: a, today: b, accessTokenFormExpanded: c, newAccessTokenName: d, newAccessTokenToken: e, accessTokens: f, tasks: g, taskList: h, buildInfo: i, dragDrop: j, expanded: k, datePickers: l, expandedAssigneeStatusOverlay: m};
+														return function (n) {
+															return function (o) {
+																return {apiHost: a, today: b, accessTokenFormExpanded: c, newAccessTokenName: d, newAccessTokenToken: e, accessTokens: f, tasks: g, taskList: h, workspaces: i, defaultWorkspace: j, buildInfo: k, dragDrop: l, expanded: m, datePickers: n, expandedAssigneeStatusOverlay: o};
+															};
+														};
 													};
 												};
 											};
@@ -11780,6 +11784,9 @@
 	var _johannth$what_to_read_next$Types$Upcoming = {ctor: 'Upcoming'};
 	var _johannth$what_to_read_next$Types$Today = {ctor: 'Today'};
 	var _johannth$what_to_read_next$Types$New = {ctor: 'New'};
+	var _johannth$what_to_read_next$Types$SetDefaultWorkspace = function (a) {
+		return {ctor: 'SetDefaultWorkspace', _0: a};
+	};
 	var _johannth$what_to_read_next$Types$SetAssigneeStatus = F2(
 		function (a, b) {
 			return {ctor: 'SetAssigneeStatus', _0: a, _1: b};
@@ -11827,6 +11834,10 @@
 	var _johannth$what_to_read_next$Types$TaskUpdated = function (a) {
 		return {ctor: 'TaskUpdated', _0: a};
 	};
+	var _johannth$what_to_read_next$Types$TaskCreated = F2(
+		function (a, b) {
+			return {ctor: 'TaskCreated', _0: a, _1: b};
+		});
 	var _johannth$what_to_read_next$Types$LoadTasks = function (a) {
 		return {ctor: 'LoadTasks', _0: a};
 	};
@@ -12916,6 +12927,26 @@
 					});
 		}
 	};
+	var _johannth$what_to_read_next$Api$encodeAsanaTaskForCreation = function (task) {
+		return _elm_lang$core$Json_Encode$object(
+			{
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'name',
+					_1: _elm_lang$core$Json_Encode$string(task.name)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'assigneeStatus',
+						_1: _johannth$what_to_read_next$Api$encodeAssigneeStatus(task.assigneeStatus)
+					},
+					_1: {ctor: '[]'}
+				}
+			});
+	};
 	var _johannth$what_to_read_next$Api$decodeAssigneeStatus = A2(
 		_elm_lang$core$Json_Decode$map,
 		function (value) {
@@ -13035,6 +13066,22 @@
 					accessTokens,
 					A2(_johannth$what_to_read_next$Api$apiUrl, apiHost, '/api/tasks'),
 					A2(_elm_lang$core$Json_Decode$field, 'tasks', _johannth$what_to_read_next$Api$decodeTaskList)));
+		});
+	var _johannth$what_to_read_next$Api$createTask = F3(
+		function (apiHost, accessTokens, task) {
+			return A2(
+				_elm_lang$http$Http$send,
+				_johannth$what_to_read_next$Types$TaskCreated(task.id),
+				A4(
+					_johannth$what_to_read_next$Api$postJson,
+					accessTokens,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						A2(_johannth$what_to_read_next$Api$apiUrl, apiHost, '/api/tasks/'),
+						A2(_elm_lang$core$Basics_ops['++'], task.workspace.id, '/')),
+					_elm_lang$http$Http$jsonBody(
+						_johannth$what_to_read_next$Api$encodeAsanaTaskForCreation(task)),
+					A2(_elm_lang$core$Json_Decode$field, 'task', _johannth$what_to_read_next$Api$decodeAsanaTask)));
 		});
 	var _johannth$what_to_read_next$Api$updateTask = F4(
 		function (apiHost, accessTokens, task, mutation) {
@@ -13190,13 +13237,18 @@
 	var _johannth$what_to_read_next$State$titleInputId = function (taskId) {
 		return A2(_elm_lang$core$Basics_ops['++'], 'taskTitle', taskId);
 	};
+	var _johannth$what_to_read_next$State$defaultWorkspaceStorageKey = 'defaultWorkspace';
 	var _johannth$what_to_read_next$State$accessTokensStorageKey = 'accessTokens';
 	var _johannth$what_to_read_next$State$init = F2(
 		function (flags, location) {
 			var initialCommands = {
 				ctor: '::',
 				_0: _johannth$what_to_read_next$LocalStorage$getItem(_johannth$what_to_read_next$State$accessTokensStorageKey),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: _johannth$what_to_read_next$LocalStorage$getItem(_johannth$what_to_read_next$State$defaultWorkspaceStorageKey),
+					_1: {ctor: '[]'}
+				}
 			};
 			var initialModel = {
 				apiHost: flags.apiHost,
@@ -13207,6 +13259,8 @@
 				accessTokens: {ctor: '[]'},
 				tasks: _elm_lang$core$Dict$empty,
 				taskList: _elm_lang$core$Array$empty,
+				workspaces: _elm_lang$core$Dict$empty,
+				defaultWorkspace: _elm_lang$core$Maybe$Nothing,
 				buildInfo: A3(_johannth$what_to_read_next$Types$BuildInfo, flags.buildVersion, flags.buildTime, flags.buildTier),
 				dragDrop: _norpan$elm_html5_drag_drop$Html5_DragDrop$init,
 				expanded: {today: true, $new: true, upcoming: false, later: false},
@@ -13243,28 +13297,50 @@
 						{ctor: '[]'});
 				case 'ReceiveItem':
 					var _p13 = _p9._0;
-					var maybeAccessTokens = function () {
-						var _p10 = _p13.key;
-						return A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p13, _johannth$what_to_read_next$Api$decodeAccessTokens);
-					}();
-					var _p11 = maybeAccessTokens;
-					if (_p11.ctor === 'Just') {
-						var _p12 = _p11._0;
-						return A2(
-							_elm_lang$core$Platform_Cmd_ops['!'],
-							_elm_lang$core$Native_Utils.update(
+					if (_elm_lang$core$Native_Utils.eq(_p13.key, _johannth$what_to_read_next$State$accessTokensStorageKey)) {
+						var maybeAccessTokens = A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p13, _johannth$what_to_read_next$Api$decodeAccessTokens);
+						var _p10 = maybeAccessTokens;
+						if (_p10.ctor === 'Just') {
+							var _p11 = _p10._0;
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{accessTokens: _p11}),
+								{
+									ctor: '::',
+									_0: A2(_johannth$what_to_read_next$Api$getTasks, model.apiHost, _p11),
+									_1: {ctor: '[]'}
+								});
+						} else {
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
 								model,
-								{accessTokens: _p12}),
-							{
-								ctor: '::',
-								_0: A2(_johannth$what_to_read_next$Api$getTasks, model.apiHost, _p12),
-								_1: {ctor: '[]'}
-							});
+								{ctor: '[]'});
+						}
 					} else {
-						return A2(
-							_elm_lang$core$Platform_Cmd_ops['!'],
-							model,
-							{ctor: '[]'});
+						if (_elm_lang$core$Native_Utils.eq(_p13.key, _johannth$what_to_read_next$State$defaultWorkspaceStorageKey)) {
+							var maybeDefaultWorkspace = A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p13, _elm_lang$core$Json_Decode$string);
+							var _p12 = maybeDefaultWorkspace;
+							if (_p12.ctor === 'Just') {
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									_elm_lang$core$Native_Utils.update(
+										model,
+										{defaultWorkspace: maybeDefaultWorkspace}),
+									{ctor: '[]'});
+							} else {
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									model,
+									{ctor: '[]'});
+							}
+						} else {
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								model,
+								{ctor: '[]'});
+						}
 					}
 				case 'ToggleAccessTokenForm':
 					return A2(
@@ -13351,6 +13427,13 @@
 									return {ctor: '_Tuple2', _0: task.id, _1: task};
 								},
 								_p15));
+						var workspaces = _elm_lang$core$Dict$fromList(
+							A2(
+								_elm_lang$core$List$map,
+								function (task) {
+									return {ctor: '_Tuple2', _0: task.workspace.id, _1: task.workspace};
+								},
+								_elm_lang$core$Dict$values(tasks)));
 						var _p14 = _johannth$what_to_read_next$State$initDatePickers(
 							_elm_lang$core$Dict$values(tasks));
 						var datePickers = _p14._0;
@@ -13368,10 +13451,29 @@
 								{
 									taskList: _elm_lang$core$Array$fromList(taskList),
 									tasks: tasks,
-									datePickers: datePickers
+									datePickers: datePickers,
+									workspaces: workspaces
 								}),
 							datePickerFx);
 					}
+				case 'SetDefaultWorkspace':
+					var _p16 = _p9._0;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								defaultWorkspace: _elm_lang$core$Maybe$Just(_p16)
+							}),
+						{
+							ctor: '::',
+							_0: _johannth$what_to_read_next$LocalStorage$setItem(
+								A2(
+									_johannth$what_to_read_next$LocalStorage$encodeToItem,
+									_johannth$what_to_read_next$State$defaultWorkspaceStorageKey,
+									_elm_lang$core$Json_Encode$string(_p16))),
+							_1: {ctor: '[]'}
+						});
 				case 'ToggleExpanded':
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
@@ -13382,9 +13484,9 @@
 							}),
 						{ctor: '[]'});
 				case 'CompleteTask':
-					var _p17 = _p9._0;
-					var _p16 = A2(_elm_lang$core$Dict$get, _p17, model.tasks);
-					if (_p16.ctor === 'Just') {
+					var _p18 = _p9._0;
+					var _p17 = A2(_elm_lang$core$Dict$get, _p18, model.tasks);
+					if (_p17.ctor === 'Just') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -13393,13 +13495,13 @@
 									taskList: A2(
 										_elm_lang$core$Array$filter,
 										function (taskId) {
-											return !_elm_lang$core$Native_Utils.eq(taskId, _p17);
+											return !_elm_lang$core$Native_Utils.eq(taskId, _p18);
 										},
 										model.taskList)
 								}),
 							{
 								ctor: '::',
-								_0: A4(_johannth$what_to_read_next$Api$updateTask, model.apiHost, model.accessTokens, _p16._0, _johannth$what_to_read_next$Types$Complete),
+								_0: A4(_johannth$what_to_read_next$Api$updateTask, model.apiHost, model.accessTokens, _p17._0, _johannth$what_to_read_next$Types$Complete),
 								_1: {ctor: '[]'}
 							});
 					} else {
@@ -13409,18 +13511,18 @@
 							{ctor: '[]'});
 					}
 				case 'EditTaskName':
-					var _p19 = _p9._0;
-					var _p18 = A2(_elm_lang$core$Dict$get, _p19, model.tasks);
-					if (_p18.ctor === 'Just') {
+					var _p20 = _p9._0;
+					var _p19 = A2(_elm_lang$core$Dict$get, _p20, model.tasks);
+					if (_p19.ctor === 'Just') {
 						var updatedTask = _elm_lang$core$Native_Utils.update(
-							_p18._0,
+							_p19._0,
 							{name: _p9._1});
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									tasks: A3(_elm_lang$core$Dict$insert, _p19, updatedTask, model.tasks)
+									tasks: A3(_elm_lang$core$Dict$insert, _p20, updatedTask, model.tasks)
 								}),
 							{ctor: '[]'});
 					} else {
@@ -13430,20 +13532,21 @@
 							{ctor: '[]'});
 					}
 				case 'StopEditTaskName':
-					var _p20 = A2(_elm_lang$core$Dict$get, _p9._0, model.tasks);
-					if (_p20.ctor === 'Just') {
-						var _p21 = _p20._0;
+					var _p21 = A2(_elm_lang$core$Dict$get, _p9._0, model.tasks);
+					if (_p21.ctor === 'Just') {
+						var _p22 = _p21._0;
+						var command = A2(_elm_lang$core$String$startsWith, 'local-', _p22.id) ? A3(_johannth$what_to_read_next$Api$createTask, model.apiHost, model.accessTokens, _p22) : A4(
+							_johannth$what_to_read_next$Api$updateTask,
+							model.apiHost,
+							model.accessTokens,
+							_p22,
+							_johannth$what_to_read_next$Types$UpdateName(_p22.name));
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							model,
 							{
 								ctor: '::',
-								_0: A4(
-									_johannth$what_to_read_next$Api$updateTask,
-									model.apiHost,
-									model.accessTokens,
-									_p21,
-									_johannth$what_to_read_next$Types$UpdateName(_p21.name)),
+								_0: command,
 								_1: {ctor: '[]'}
 							});
 					} else {
@@ -13453,85 +13556,101 @@
 							{ctor: '[]'});
 					}
 				case 'AddNewTask':
-					var _p22 = _elm_community$elm_datepicker$DatePicker$init(_elm_community$elm_datepicker$DatePicker$defaultSettings);
-					var datePicker = _p22._0;
-					var datePickerFx = _p22._1;
-					var localId = _elm_lang$core$Basics$toString(
-						_elm_lang$core$Array$length(model.taskList));
-					var task = A7(
-						_johannth$what_to_read_next$Types$AsanaTask,
-						localId,
-						'',
-						_p9._0._0,
-						{ctor: '[]'},
-						A2(_johannth$what_to_read_next$Types$AsanaWorkspace, '', ''),
-						'',
-						_elm_lang$core$Maybe$Nothing);
-					var taskList = A3(_johannth$what_to_read_next$State$insertAfterIndex, _p9._0._2, task.id, model.taskList);
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
+					var _p23 = A2(
+						_elm_lang$core$Maybe$andThen,
+						function (workspaceId) {
+							return A2(_elm_lang$core$Dict$get, workspaceId, model.workspaces);
+						},
+						model.defaultWorkspace);
+					if (_p23.ctor === 'Just') {
+						var _p24 = _elm_community$elm_datepicker$DatePicker$init(_elm_community$elm_datepicker$DatePicker$defaultSettings);
+						var datePicker = _p24._0;
+						var datePickerFx = _p24._1;
+						var localId = A2(
+							_elm_lang$core$Basics_ops['++'],
+							'local-',
+							_elm_lang$core$Basics$toString(
+								_elm_lang$core$Array$length(model.taskList)));
+						var task = A7(
+							_johannth$what_to_read_next$Types$AsanaTask,
+							localId,
+							'',
+							_p9._0._0,
+							{ctor: '[]'},
+							_p23._0,
+							'',
+							_elm_lang$core$Maybe$Nothing);
+						var taskList = A3(_johannth$what_to_read_next$State$insertAfterIndex, _p9._0._2, task.id, model.taskList);
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									tasks: A3(_elm_lang$core$Dict$insert, task.id, task, model.tasks),
+									taskList: taskList,
+									datePickers: A3(_elm_lang$core$Dict$insert, task.id, datePicker, model.datePickers)
+								}),
 							{
-								tasks: A3(_elm_lang$core$Dict$insert, task.id, task, model.tasks),
-								taskList: taskList,
-								datePickers: A3(_elm_lang$core$Dict$insert, task.id, datePicker, model.datePickers)
-							}),
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$core$Task$attempt,
-								_johannth$what_to_read_next$Types$FocusResult,
-								_elm_lang$dom$Dom$focus(
-									_johannth$what_to_read_next$State$titleInputId(task.id))),
-							_1: {
 								ctor: '::',
 								_0: A2(
-									_elm_lang$core$Platform_Cmd$map,
-									_johannth$what_to_read_next$Types$ToDatePicker(task.id),
-									datePickerFx),
-								_1: {ctor: '[]'}
-							}
-						});
+									_elm_lang$core$Task$attempt,
+									_johannth$what_to_read_next$Types$FocusResult,
+									_elm_lang$dom$Dom$focus(
+										_johannth$what_to_read_next$State$titleInputId(task.id))),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$core$Platform_Cmd$map,
+										_johannth$what_to_read_next$Types$ToDatePicker(task.id),
+										datePickerFx),
+									_1: {ctor: '[]'}
+								}
+							});
+					} else {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{ctor: '[]'});
+					}
 				case 'ToDatePicker':
-					var _p29 = _p9._0;
-					var _p23 = {
+					var _p31 = _p9._0;
+					var _p25 = {
 						ctor: '_Tuple2',
-						_0: A2(_elm_lang$core$Dict$get, _p29, model.datePickers),
-						_1: A2(_elm_lang$core$Dict$get, _p29, model.tasks)
+						_0: A2(_elm_lang$core$Dict$get, _p31, model.datePickers),
+						_1: A2(_elm_lang$core$Dict$get, _p31, model.tasks)
 					};
-					if (((_p23.ctor === '_Tuple2') && (_p23._0.ctor === 'Just')) && (_p23._1.ctor === 'Just')) {
-						var _p28 = _p23._1._0;
-						var _p24 = A2(_elm_community$elm_datepicker$DatePicker$update, _p9._1, _p23._0._0);
-						var newDatePicker = _p24._0;
-						var datePickerFx = _p24._1;
-						var maybeDate = _p24._2;
-						var datePickers = A3(_elm_lang$core$Dict$insert, _p29, newDatePicker, model.datePickers);
-						var _p25 = function () {
-							var _p26 = maybeDate;
-							if (_p26.ctor === 'Just') {
-								var _p27 = _p26._0;
+					if (((_p25.ctor === '_Tuple2') && (_p25._0.ctor === 'Just')) && (_p25._1.ctor === 'Just')) {
+						var _p30 = _p25._1._0;
+						var _p26 = A2(_elm_community$elm_datepicker$DatePicker$update, _p9._1, _p25._0._0);
+						var newDatePicker = _p26._0;
+						var datePickerFx = _p26._1;
+						var maybeDate = _p26._2;
+						var datePickers = A3(_elm_lang$core$Dict$insert, _p31, newDatePicker, model.datePickers);
+						var _p27 = function () {
+							var _p28 = maybeDate;
+							if (_p28.ctor === 'Just') {
+								var _p29 = _p28._0;
 								return {
 									ctor: '_Tuple2',
 									_0: _elm_lang$core$Native_Utils.update(
-										_p28,
+										_p30,
 										{
-											dueOn: _elm_lang$core$Maybe$Just(_p27)
+											dueOn: _elm_lang$core$Maybe$Just(_p29)
 										}),
 									_1: A4(
 										_johannth$what_to_read_next$Api$updateTask,
 										model.apiHost,
 										model.accessTokens,
-										_p28,
-										_johannth$what_to_read_next$Types$UpdateDueOn(_p27))
+										_p30,
+										_johannth$what_to_read_next$Types$UpdateDueOn(_p29))
 								};
 							} else {
-								return {ctor: '_Tuple2', _0: _p28, _1: _elm_lang$core$Platform_Cmd$none};
+								return {ctor: '_Tuple2', _0: _p30, _1: _elm_lang$core$Platform_Cmd$none};
 							}
 						}();
-						var updatedTask = _p25._0;
-						var command = _p25._1;
-						var tasks = A3(_elm_lang$core$Dict$insert, _p29, updatedTask, model.tasks);
+						var updatedTask = _p27._0;
+						var command = _p27._1;
+						var tasks = A3(_elm_lang$core$Dict$insert, _p31, updatedTask, model.tasks);
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -13541,7 +13660,7 @@
 								ctor: '::',
 								_0: A2(
 									_elm_lang$core$Platform_Cmd$map,
-									_johannth$what_to_read_next$Types$ToDatePicker(_p29),
+									_johannth$what_to_read_next$Types$ToDatePicker(_p31),
 									datePickerFx),
 								_1: {
 									ctor: '::',
@@ -13555,34 +13674,69 @@
 							model,
 							{ctor: '[]'});
 					}
+				case 'TaskCreated':
+					if (_p9._1.ctor === 'Err') {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{ctor: '[]'});
+					} else {
+						var _p34 = _p9._1._0;
+						var _p33 = _p9._0;
+						var datePickers = function () {
+							var _p32 = A2(_elm_lang$core$Dict$get, _p33, model.datePickers);
+							if (_p32.ctor === 'Just') {
+								return A3(
+									_elm_lang$core$Dict$insert,
+									_p34.id,
+									_p32._0,
+									A2(_elm_lang$core$Dict$remove, _p33, model.datePickers));
+							} else {
+								return model.datePickers;
+							}
+						}();
+						var taskList = A2(
+							_elm_lang$core$Array$map,
+							function (taskId) {
+								return _elm_lang$core$Native_Utils.eq(taskId, _p33) ? _p34.id : taskId;
+							},
+							model.taskList);
+						var tasks = A3(_elm_lang$core$Dict$insert, _p34.id, _p34, model.tasks);
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{tasks: tasks, taskList: taskList, datePickers: datePickers}),
+							{ctor: '[]'});
+					}
 				case 'TaskUpdated':
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						model,
 						{ctor: '[]'});
 				case 'DragDropMsg':
-					var _p30 = A2(_norpan$elm_html5_drag_drop$Html5_DragDrop$update, _p9._0, model.dragDrop);
-					var model_ = _p30._0;
-					var result = _p30._1;
-					var _p31 = function () {
-						var _p32 = result;
-						if (_p32.ctor === 'Just') {
-							var _p35 = _p32._0._1._0;
-							var _p34 = _p32._0._0._1;
-							var _p33 = A2(_elm_lang$core$Dict$get, _p34, model.tasks);
-							if (_p33.ctor === 'Just') {
+					var _p35 = A2(_norpan$elm_html5_drag_drop$Html5_DragDrop$update, _p9._0, model.dragDrop);
+					var model_ = _p35._0;
+					var result = _p35._1;
+					var _p36 = function () {
+						var _p37 = result;
+						if (_p37.ctor === 'Just') {
+							var _p40 = _p37._0._1._0;
+							var _p39 = _p37._0._0._1;
+							var _p38 = A2(_elm_lang$core$Dict$get, _p39, model.tasks);
+							if (_p38.ctor === 'Just') {
 								return {
 									ctor: '_Tuple3',
-									_0: A3(_johannth$what_to_read_next$State$moveItemInArray, _p32._0._0._2, _p32._0._1._2, model.taskList),
-									_1: A3(_johannth$what_to_read_next$State$updateAssigneeStatus, _p34, _p35, model.tasks),
+									_0: A3(_johannth$what_to_read_next$State$moveItemInArray, _p37._0._0._2, _p37._0._1._2, model.taskList),
+									_1: A3(_johannth$what_to_read_next$State$updateAssigneeStatus, _p39, _p40, model.tasks),
 									_2: {
 										ctor: '::',
 										_0: A4(
 											_johannth$what_to_read_next$Api$updateTask,
 											model.apiHost,
 											model.accessTokens,
-											_p33._0,
-											_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p35)),
+											_p38._0,
+											_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p40)),
 										_1: {ctor: '[]'}
 									}
 								};
@@ -13603,9 +13757,9 @@
 							};
 						}
 					}();
-					var taskList = _p31._0;
-					var tasks = _p31._1;
-					var commands = _p31._2;
+					var taskList = _p36._0;
+					var tasks = _p36._1;
+					var commands = _p36._2;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
@@ -13613,7 +13767,7 @@
 							{dragDrop: model_, taskList: taskList, tasks: tasks}),
 						commands);
 				case 'ToggleAssigneeStatusOverlay':
-					var _p36 = _p9._0;
+					var _p41 = _p9._0;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
@@ -13621,24 +13775,24 @@
 							{
 								expandedAssigneeStatusOverlay: _elm_lang$core$Native_Utils.eq(
 									model.expandedAssigneeStatusOverlay,
-									_elm_lang$core$Maybe$Just(_p36)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p36)
+									_elm_lang$core$Maybe$Just(_p41)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p41)
 							}),
 						{ctor: '[]'});
 				default:
-					var _p40 = _p9._0;
-					var _p39 = _p9._1;
-					var _p37 = A2(_elm_lang$core$Dict$get, _p40, model.tasks);
-					if (_p37.ctor === 'Just') {
-						var _p38 = _p37._0;
+					var _p45 = _p9._0;
+					var _p44 = _p9._1;
+					var _p42 = A2(_elm_lang$core$Dict$get, _p45, model.tasks);
+					if (_p42.ctor === 'Just') {
+						var _p43 = _p42._0;
 						var updatedTask = _elm_lang$core$Native_Utils.update(
-							_p38,
-							{assigneeStatus: _p39});
+							_p43,
+							{assigneeStatus: _p44});
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									tasks: A3(_elm_lang$core$Dict$insert, _p40, updatedTask, model.tasks),
+									tasks: A3(_elm_lang$core$Dict$insert, _p45, updatedTask, model.tasks),
 									expandedAssigneeStatusOverlay: _elm_lang$core$Maybe$Nothing
 								}),
 							{
@@ -13647,8 +13801,8 @@
 									_johannth$what_to_read_next$Api$updateTask,
 									model.apiHost,
 									model.accessTokens,
-									_p38,
-									_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p39)),
+									_p43,
+									_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p44)),
 								_1: {ctor: '[]'}
 							});
 					} else {
@@ -14497,6 +14651,32 @@
 					}
 				});
 		});
+	var _johannth$what_to_read_next$View$workspaceView = F2(
+		function (maybeDefaultWorkspace, workspace) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_johannth$what_to_read_next$Types$SetDefaultWorkspace(workspace.id)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'workspace',
+								_elm_lang$core$Native_Utils.eq(
+									maybeDefaultWorkspace,
+									_elm_lang$core$Maybe$Just(workspace.id)) ? ' default' : '')),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(workspace.name),
+					_1: {ctor: '[]'}
+				});
+		});
 	var _johannth$what_to_read_next$View$accessTokenView = function (accessToken) {
 		return A2(
 			_elm_lang$html$Html$div,
@@ -14698,19 +14878,40 @@
 			{ctor: '[]'},
 			{
 				ctor: '::',
-				_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, true, _johannth$what_to_read_next$Types$New, 'New', allTasksWithIndexAndCategory, dropId, _p21.$new, _elm_lang$core$Basics$identity),
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('workspaces'),
+						_1: {ctor: '[]'}
+					},
+					A2(
+						_elm_lang$core$List$map,
+						_johannth$what_to_read_next$View$workspaceView(_p18.defaultWorkspace),
+						_elm_lang$core$Dict$values(_p18.workspaces))),
 				_1: {
 					ctor: '::',
-					_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Today, 'Today', allTasksWithIndexAndCategory, dropId, _p21.today, _elm_lang$core$Basics$identity),
-					_1: {
-						ctor: '::',
-						_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Upcoming, 'Upcoming', allTasksWithIndexAndCategory, dropId, _p21.upcoming, sortByDate),
-						_1: {
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
 							ctor: '::',
-							_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Later, 'Later', allTasksWithIndexAndCategory, dropId, _p21.later, sortByDate),
-							_1: {ctor: '[]'}
-						}
-					}
+							_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, true, _johannth$what_to_read_next$Types$New, 'New', allTasksWithIndexAndCategory, dropId, _p21.$new, _elm_lang$core$Basics$identity),
+							_1: {
+								ctor: '::',
+								_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Today, 'Today', allTasksWithIndexAndCategory, dropId, _p21.today, _elm_lang$core$Basics$identity),
+								_1: {
+									ctor: '::',
+									_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Upcoming, 'Upcoming', allTasksWithIndexAndCategory, dropId, _p21.upcoming, sortByDate),
+									_1: {
+										ctor: '::',
+										_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Later, 'Later', allTasksWithIndexAndCategory, dropId, _p21.later, sortByDate),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
 				}
 			});
 	};
@@ -14911,8 +15112,8 @@
 	var mountNode = document.getElementById('app');
 	var app = Elm.Main.embed(mountNode, {
 	  today: Date.now(),
-	  buildVersion: ("3b6801e180641d7f8dcc1194239f22e372c3d931\n"),
-	  buildTime: ("2017-04-19T14:21:55.033Z"),
+	  buildVersion: ("abacf700de921fb91f95581f060f7031edd11521\n"),
+	  buildTime: ("2017-04-19T15:56:14.302Z"),
 	  buildTier: ("production"),
 	  apiHost: ("https://asana-inbox.herokuapp.com"),
 	});
