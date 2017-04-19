@@ -11742,7 +11742,11 @@
 									return function (i) {
 										return function (j) {
 											return function (k) {
-												return {apiHost: a, accessTokenFormExpanded: b, newAccessTokenName: c, newAccessTokenToken: d, accessTokens: e, tasks: f, taskList: g, buildInfo: h, dragDrop: i, expanded: j, datePickers: k};
+												return function (l) {
+													return function (m) {
+														return {apiHost: a, today: b, accessTokenFormExpanded: c, newAccessTokenName: d, newAccessTokenToken: e, accessTokens: f, tasks: g, taskList: h, buildInfo: i, dragDrop: j, expanded: k, datePickers: l, expandedAssigneeStatusOverlay: m};
+													};
+												};
 											};
 										};
 									};
@@ -11754,9 +11758,9 @@
 			};
 		};
 	};
-	var _johannth$what_to_read_next$Types$Flags = F4(
-		function (a, b, c, d) {
-			return {apiHost: a, buildVersion: b, buildTier: c, buildTime: d};
+	var _johannth$what_to_read_next$Types$Flags = F5(
+		function (a, b, c, d, e) {
+			return {apiHost: a, today: b, buildVersion: c, buildTier: d, buildTime: e};
 		});
 	var _johannth$what_to_read_next$Types$BuildInfo = F3(
 		function (a, b, c) {
@@ -11776,6 +11780,13 @@
 	var _johannth$what_to_read_next$Types$Upcoming = {ctor: 'Upcoming'};
 	var _johannth$what_to_read_next$Types$Today = {ctor: 'Today'};
 	var _johannth$what_to_read_next$Types$New = {ctor: 'New'};
+	var _johannth$what_to_read_next$Types$SetAssigneeStatus = F2(
+		function (a, b) {
+			return {ctor: 'SetAssigneeStatus', _0: a, _1: b};
+		});
+	var _johannth$what_to_read_next$Types$ToggleAssigneeStatusOverlay = function (a) {
+		return {ctor: 'ToggleAssigneeStatusOverlay', _0: a};
+	};
 	var _johannth$what_to_read_next$Types$ToDatePicker = F2(
 		function (a, b) {
 			return {ctor: 'ToDatePicker', _0: a, _1: b};
@@ -13189,6 +13200,7 @@
 			};
 			var initialModel = {
 				apiHost: flags.apiHost,
+				today: _elm_lang$core$Date$fromTime(flags.today),
 				accessTokenFormExpanded: false,
 				newAccessTokenName: '',
 				newAccessTokenToken: '',
@@ -13198,7 +13210,8 @@
 				buildInfo: A3(_johannth$what_to_read_next$Types$BuildInfo, flags.buildVersion, flags.buildTime, flags.buildTier),
 				dragDrop: _norpan$elm_html5_drag_drop$Html5_DragDrop$init,
 				expanded: {today: true, $new: true, upcoming: false, later: false},
-				datePickers: _elm_lang$core$Dict$empty
+				datePickers: _elm_lang$core$Dict$empty,
+				expandedAssigneeStatusOverlay: _elm_lang$core$Maybe$Nothing
 			};
 			return A2(_elm_lang$core$Platform_Cmd_ops['!'], initialModel, initialCommands);
 		});
@@ -13547,7 +13560,7 @@
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						model,
 						{ctor: '[]'});
-				default:
+				case 'DragDropMsg':
 					var _p30 = A2(_norpan$elm_html5_drag_drop$Html5_DragDrop$update, _p9._0, model.dragDrop);
 					var model_ = _p30._0;
 					var result = _p30._1;
@@ -13599,8 +13612,285 @@
 							model,
 							{dragDrop: model_, taskList: taskList, tasks: tasks}),
 						commands);
+				case 'ToggleAssigneeStatusOverlay':
+					var _p36 = _p9._0;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								expandedAssigneeStatusOverlay: _elm_lang$core$Native_Utils.eq(
+									model.expandedAssigneeStatusOverlay,
+									_elm_lang$core$Maybe$Just(_p36)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p36)
+							}),
+						{ctor: '[]'});
+				default:
+					var _p40 = _p9._0;
+					var _p39 = _p9._1;
+					var _p37 = A2(_elm_lang$core$Dict$get, _p40, model.tasks);
+					if (_p37.ctor === 'Just') {
+						var _p38 = _p37._0;
+						var updatedTask = _elm_lang$core$Native_Utils.update(
+							_p38,
+							{assigneeStatus: _p39});
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									tasks: A3(_elm_lang$core$Dict$insert, _p40, updatedTask, model.tasks),
+									expandedAssigneeStatusOverlay: _elm_lang$core$Maybe$Nothing
+								}),
+							{
+								ctor: '::',
+								_0: A4(
+									_johannth$what_to_read_next$Api$updateTask,
+									model.apiHost,
+									model.accessTokens,
+									_p38,
+									_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p39)),
+								_1: {ctor: '[]'}
+							});
+					} else {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{ctor: '[]'});
+					}
 			}
 		});
+	
+	var _rluiten$elm_date_extra$Date_Extra_Compare$is3 = F4(
+		function (comp, date1, date2, date3) {
+			var time3 = _rluiten$elm_date_extra$Date_Extra_Core$toTime(date3);
+			var time2 = _rluiten$elm_date_extra$Date_Extra_Core$toTime(date2);
+			var highBound = A2(_elm_lang$core$Basics$max, time2, time3);
+			var lowBound = A2(_elm_lang$core$Basics$min, time2, time3);
+			var time1 = _rluiten$elm_date_extra$Date_Extra_Core$toTime(date1);
+			var _p0 = comp;
+			switch (_p0.ctor) {
+				case 'Between':
+					return (_elm_lang$core$Native_Utils.cmp(time1, lowBound) > 0) && (_elm_lang$core$Native_Utils.cmp(time1, highBound) < 0);
+				case 'BetweenOpenStart':
+					return (_elm_lang$core$Native_Utils.cmp(time1, lowBound) > -1) && (_elm_lang$core$Native_Utils.cmp(time1, highBound) < 0);
+				case 'BetweenOpenEnd':
+					return (_elm_lang$core$Native_Utils.cmp(time1, lowBound) > 0) && (_elm_lang$core$Native_Utils.cmp(time1, highBound) < 1);
+				default:
+					return (_elm_lang$core$Native_Utils.cmp(time1, lowBound) > -1) && (_elm_lang$core$Native_Utils.cmp(time1, highBound) < 1);
+			}
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Compare$is = F3(
+		function (comp, date1, date2) {
+			var time2 = _rluiten$elm_date_extra$Date_Extra_Core$toTime(date2);
+			var time1 = _rluiten$elm_date_extra$Date_Extra_Core$toTime(date1);
+			var _p1 = comp;
+			switch (_p1.ctor) {
+				case 'Before':
+					return _elm_lang$core$Native_Utils.cmp(time1, time2) < 0;
+				case 'After':
+					return _elm_lang$core$Native_Utils.cmp(time1, time2) > 0;
+				case 'Same':
+					return _elm_lang$core$Native_Utils.eq(time1, time2);
+				case 'SameOrBefore':
+					return _elm_lang$core$Native_Utils.cmp(time1, time2) < 1;
+				default:
+					return _elm_lang$core$Native_Utils.cmp(time1, time2) > -1;
+			}
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Compare$SameOrBefore = {ctor: 'SameOrBefore'};
+	var _rluiten$elm_date_extra$Date_Extra_Compare$SameOrAfter = {ctor: 'SameOrAfter'};
+	var _rluiten$elm_date_extra$Date_Extra_Compare$Same = {ctor: 'Same'};
+	var _rluiten$elm_date_extra$Date_Extra_Compare$Before = {ctor: 'Before'};
+	var _rluiten$elm_date_extra$Date_Extra_Compare$After = {ctor: 'After'};
+	var _rluiten$elm_date_extra$Date_Extra_Compare$BetweenOpen = {ctor: 'BetweenOpen'};
+	var _rluiten$elm_date_extra$Date_Extra_Compare$BetweenOpenEnd = {ctor: 'BetweenOpenEnd'};
+	var _rluiten$elm_date_extra$Date_Extra_Compare$BetweenOpenStart = {ctor: 'BetweenOpenStart'};
+	var _rluiten$elm_date_extra$Date_Extra_Compare$Between = {ctor: 'Between'};
+	
+	var _rluiten$elm_date_extra$Date_Extra_Duration$positiveDiffDays = F3(
+		function (date1, date2, multiplier) {
+			var date2DaysFromCivil = A3(
+				_rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil,
+				_elm_lang$core$Date$year(date2),
+				_rluiten$elm_date_extra$Date_Extra_Core$monthToInt(
+					_elm_lang$core$Date$month(date2)),
+				_elm_lang$core$Date$day(date2));
+			var date1DaysFromCivil = A3(
+				_rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil,
+				_elm_lang$core$Date$year(date1),
+				_rluiten$elm_date_extra$Date_Extra_Core$monthToInt(
+					_elm_lang$core$Date$month(date1)),
+				_elm_lang$core$Date$day(date1));
+			return (date1DaysFromCivil - date2DaysFromCivil) * multiplier;
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$diffDays = F2(
+		function (date1, date2) {
+			return A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$After, date1, date2) ? A3(_rluiten$elm_date_extra$Date_Extra_Duration$positiveDiffDays, date1, date2, 1) : A3(_rluiten$elm_date_extra$Date_Extra_Duration$positiveDiffDays, date2, date1, -1);
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$positiveDiff = F3(
+		function (date1, date2, multiplier) {
+			var accDiff = F4(
+				function (acc, v1, v2, maxV2) {
+					return (_elm_lang$core$Native_Utils.cmp(v1, v2) < 0) ? {ctor: '_Tuple2', _0: acc - 1, _1: (maxV2 + v1) - v2} : {ctor: '_Tuple2', _0: acc, _1: v1 - v2};
+				});
+			var msec2 = _elm_lang$core$Date$millisecond(date2);
+			var msec1 = _elm_lang$core$Date$millisecond(date1);
+			var second2 = _elm_lang$core$Date$second(date2);
+			var second1 = _elm_lang$core$Date$second(date1);
+			var minute2 = _elm_lang$core$Date$minute(date2);
+			var minute1 = _elm_lang$core$Date$minute(date1);
+			var hour2 = _elm_lang$core$Date$hour(date2);
+			var hour1 = _elm_lang$core$Date$hour(date1);
+			var day2 = _elm_lang$core$Date$day(date2);
+			var day1 = _elm_lang$core$Date$day(date1);
+			var month2Mon = _elm_lang$core$Date$month(date2);
+			var month2 = _rluiten$elm_date_extra$Date_Extra_Core$monthToInt(month2Mon);
+			var month1Mon = _elm_lang$core$Date$month(date1);
+			var month1 = _rluiten$elm_date_extra$Date_Extra_Core$monthToInt(month1Mon);
+			var year2 = _elm_lang$core$Date$year(date2);
+			var daysInDate2Month = A2(_rluiten$elm_date_extra$Date_Extra_Core$daysInMonth, year2, month2Mon);
+			var year1 = _elm_lang$core$Date$year(date1);
+			var _p0 = A4(accDiff, year1 - year2, month1, month2, 12);
+			var yearDiff = _p0._0;
+			var monthDiffA = _p0._1;
+			var _p1 = A4(accDiff, monthDiffA, day1, day2, daysInDate2Month);
+			var monthDiff = _p1._0;
+			var dayDiffA = _p1._1;
+			var _p2 = A4(accDiff, dayDiffA, hour1, hour2, 24);
+			var dayDiff = _p2._0;
+			var hourDiffA = _p2._1;
+			var _p3 = A4(accDiff, hourDiffA, minute1, minute2, 60);
+			var hourDiff = _p3._0;
+			var minuteDiffA = _p3._1;
+			var _p4 = A4(accDiff, minuteDiffA, second1, second2, 60);
+			var minuteDiff = _p4._0;
+			var secondDiffA = _p4._1;
+			var _p5 = A4(accDiff, secondDiffA, msec1, msec2, 1000);
+			var secondDiff = _p5._0;
+			var msecDiff = _p5._1;
+			return {year: yearDiff * multiplier, month: monthDiff * multiplier, day: dayDiff * multiplier, hour: hourDiff * multiplier, minute: minuteDiff * multiplier, second: secondDiff * multiplier, millisecond: msecDiff * multiplier};
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$diff = F2(
+		function (date1, date2) {
+			return A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$After, date1, date2) ? A3(_rluiten$elm_date_extra$Date_Extra_Duration$positiveDiff, date1, date2, 1) : A3(_rluiten$elm_date_extra$Date_Extra_Duration$positiveDiff, date2, date1, -1);
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$addMonth = F2(
+		function (monthCount, date) {
+			var day = _elm_lang$core$Date$day(date);
+			var monthInt = _rluiten$elm_date_extra$Date_Extra_Core$monthToInt(
+				_elm_lang$core$Date$month(date));
+			var newMonthInt = monthInt + monthCount;
+			var targetMonthInt = A2(_elm_lang$core$Basics_ops['%'], newMonthInt, 12);
+			var yearOffset = (_elm_lang$core$Native_Utils.cmp(newMonthInt, 0) < 0) ? (((newMonthInt / 12) | 0) - 1) : ((newMonthInt / 12) | 0);
+			var year = _elm_lang$core$Date$year(date);
+			var inputCivil = A3(_rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil, year, monthInt, day);
+			var newYear = year + yearOffset;
+			var newDay = A2(
+				_elm_lang$core$Basics$min,
+				A2(
+					_rluiten$elm_date_extra$Date_Extra_Core$daysInMonth,
+					newYear,
+					_rluiten$elm_date_extra$Date_Extra_Core$intToMonth(newMonthInt)),
+				day);
+			var newCivil = A3(_rluiten$elm_date_extra$Date_Extra_Internal$daysFromCivil, newYear, targetMonthInt, newDay);
+			var daysDifferent = newCivil - inputCivil;
+			return A3(_rluiten$elm_date_extra$Date_Extra_Period$add, _rluiten$elm_date_extra$Date_Extra_Period$Day, daysDifferent, date);
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$addYear = F2(
+		function (yearCount, date) {
+			return A2(_rluiten$elm_date_extra$Date_Extra_Duration$addMonth, 12 * yearCount, date);
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$daylightOffsetCompensate = F2(
+		function (dateBefore, dateAfter) {
+			var offsetAfter = _rluiten$elm_date_extra$Date_Extra_Create$getTimezoneOffset(dateAfter);
+			var offsetBefore = _rluiten$elm_date_extra$Date_Extra_Create$getTimezoneOffset(dateBefore);
+			if (!_elm_lang$core$Native_Utils.eq(offsetBefore, offsetAfter)) {
+				var adjustedDate = A3(_rluiten$elm_date_extra$Date_Extra_Period$add, _rluiten$elm_date_extra$Date_Extra_Period$Millisecond, (offsetAfter - offsetBefore) * _rluiten$elm_date_extra$Date_Extra_Core$ticksAMinute, dateAfter);
+				var adjustedOffset = _rluiten$elm_date_extra$Date_Extra_Create$getTimezoneOffset(adjustedDate);
+				return (!_elm_lang$core$Native_Utils.eq(adjustedOffset, offsetAfter)) ? dateAfter : adjustedDate;
+			} else {
+				return dateAfter;
+			}
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$requireDaylightCompensateInAdd = function (duration) {
+		var _p6 = duration;
+		switch (_p6.ctor) {
+			case 'Millisecond':
+				return false;
+			case 'Second':
+				return false;
+			case 'Minute':
+				return false;
+			case 'Hour':
+				return false;
+			case 'Day':
+				return true;
+			case 'Week':
+				return true;
+			case 'Month':
+				return true;
+			case 'Year':
+				return true;
+			default:
+				var _p7 = _p6._0;
+				return (!_elm_lang$core$Native_Utils.eq(_p7.day, 0)) || ((!_elm_lang$core$Native_Utils.eq(_p7.month, 0)) || (!_elm_lang$core$Native_Utils.eq(_p7.year, 0)));
+		}
+	};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$zeroDelta = {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0, millisecond: 0};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$DeltaRecord = F7(
+		function (a, b, c, d, e, f, g) {
+			return {year: a, month: b, day: c, hour: d, minute: e, second: f, millisecond: g};
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Delta = function (a) {
+		return {ctor: 'Delta', _0: a};
+	};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Year = {ctor: 'Year'};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Month = {ctor: 'Month'};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$doAdd = F3(
+		function (duration, addend, date) {
+			var _p8 = duration;
+			switch (_p8.ctor) {
+				case 'Millisecond':
+					return A3(_rluiten$elm_date_extra$Date_Extra_Period$add, _rluiten$elm_date_extra$Date_Extra_Period$Millisecond, addend, date);
+				case 'Second':
+					return A3(_rluiten$elm_date_extra$Date_Extra_Period$add, _rluiten$elm_date_extra$Date_Extra_Period$Second, addend, date);
+				case 'Minute':
+					return A3(_rluiten$elm_date_extra$Date_Extra_Period$add, _rluiten$elm_date_extra$Date_Extra_Period$Minute, addend, date);
+				case 'Hour':
+					return A3(_rluiten$elm_date_extra$Date_Extra_Period$add, _rluiten$elm_date_extra$Date_Extra_Period$Hour, addend, date);
+				case 'Day':
+					return A3(_rluiten$elm_date_extra$Date_Extra_Period$add, _rluiten$elm_date_extra$Date_Extra_Period$Day, addend, date);
+				case 'Week':
+					return A3(_rluiten$elm_date_extra$Date_Extra_Period$add, _rluiten$elm_date_extra$Date_Extra_Period$Week, addend, date);
+				case 'Month':
+					return A2(_rluiten$elm_date_extra$Date_Extra_Duration$addMonth, addend, date);
+				case 'Year':
+					return A2(_rluiten$elm_date_extra$Date_Extra_Duration$addYear, addend, date);
+				default:
+					var _p9 = _p8._0;
+					return A3(
+						_rluiten$elm_date_extra$Date_Extra_Period$add,
+						_rluiten$elm_date_extra$Date_Extra_Period$Delta(
+							{week: 0, day: _p9.day, hour: _p9.hour, minute: _p9.minute, second: _p9.second, millisecond: _p9.millisecond}),
+						addend,
+						A3(
+							_rluiten$elm_date_extra$Date_Extra_Duration$doAdd,
+							_rluiten$elm_date_extra$Date_Extra_Duration$Month,
+							_p9.month,
+							A3(_rluiten$elm_date_extra$Date_Extra_Duration$doAdd, _rluiten$elm_date_extra$Date_Extra_Duration$Year, _p9.year, date)));
+			}
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$add = F3(
+		function (duration, addend, date) {
+			var outputDate = A3(_rluiten$elm_date_extra$Date_Extra_Duration$doAdd, duration, addend, date);
+			return _rluiten$elm_date_extra$Date_Extra_Duration$requireDaylightCompensateInAdd(duration) ? A2(_rluiten$elm_date_extra$Date_Extra_Duration$daylightOffsetCompensate, date, outputDate) : outputDate;
+		});
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Week = {ctor: 'Week'};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Day = {ctor: 'Day'};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Hour = {ctor: 'Hour'};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Minute = {ctor: 'Minute'};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Second = {ctor: 'Second'};
+	var _rluiten$elm_date_extra$Date_Extra_Duration$Millisecond = {ctor: 'Millisecond'};
 	
 	var _johannth$what_to_read_next$View$buildInfoView = function (buildInfo) {
 		return _elm_lang$html$Html$text(
@@ -13618,6 +13908,107 @@
 							A3(_elm_lang$core$String$slice, 0, 8, buildInfo.version),
 							A2(_elm_lang$core$Basics_ops['++'], '-', buildInfo.tier))))));
 	};
+	var _johannth$what_to_read_next$View$assigneeStatusView = F2(
+		function (expanded, task) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('taskAssigneeStatusContainer'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('taskAssigneeStatus'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(
+									_johannth$what_to_read_next$Types$ToggleAssigneeStatusOverlay(task.id)),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: expanded ? A2(
+							_elm_lang$html$Html$ul,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('taskAssigneeStatusOverlay'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$li,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('taskAssigneeStatusOverlayItem'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(
+												A2(_johannth$what_to_read_next$Types$SetAssigneeStatus, task.id, _johannth$what_to_read_next$Types$Today)),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Mark for Today'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$li,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('taskAssigneeStatusOverlayItem'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(
+													A2(_johannth$what_to_read_next$Types$SetAssigneeStatus, task.id, _johannth$what_to_read_next$Types$Upcoming)),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Mark for Upcoming'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$li,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('taskAssigneeStatusOverlayItem'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														A2(_johannth$what_to_read_next$Types$SetAssigneeStatus, task.id, _johannth$what_to_read_next$Types$Later)),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Mark for Later'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}) : A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {ctor: '[]'}
+					}
+				});
+		});
 	var _johannth$what_to_read_next$View$onEnterPress = function (tagger) {
 		return A2(
 			_elm_lang$html$Html_Events$on,
@@ -13629,8 +14020,41 @@
 				},
 				_elm_lang$html$Html_Events$keyCode));
 	};
-	var _johannth$what_to_read_next$View$taskDatePickerView = F3(
-		function (datePicker, taskId, maybeDueDate) {
+	var _johannth$what_to_read_next$View$removeTimePart = function (date) {
+		return A7(
+			_rluiten$elm_date_extra$Date_Extra_Create$dateFromFields,
+			_elm_lang$core$Date$year(date),
+			_elm_lang$core$Date$month(date),
+			_elm_lang$core$Date$day(date),
+			0,
+			0,
+			0,
+			0);
+	};
+	var _johannth$what_to_read_next$View$friendlyDate = F2(
+		function (today, date) {
+			var dateDay = _johannth$what_to_read_next$View$removeTimePart(date);
+			var todayDay = _johannth$what_to_read_next$View$removeTimePart(today);
+			var sevenDays = A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Week, 1, todayDay);
+			var tomorrow = A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, 1, todayDay);
+			return A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$Before, dateDay, todayDay) ? {ctor: '_Tuple2', _0: 'overdue', _1: 'Overdue'} : (A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$Same, dateDay, todayDay) ? {ctor: '_Tuple2', _0: 'today', _1: 'Today'} : (A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$Same, dateDay, tomorrow) ? {ctor: '_Tuple2', _0: 'tomorrow', _1: 'Tomorrow'} : (A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$SameOrBefore, dateDay, sevenDays) ? {
+				ctor: '_Tuple2',
+				_0: '',
+				_1: A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%A', date)
+			} : (_elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$Date$year(todayDay),
+				_elm_lang$core$Date$year(dateDay)) ? {
+				ctor: '_Tuple2',
+				_0: '',
+				_1: A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%e %B', date)
+			} : {
+				ctor: '_Tuple2',
+				_0: '',
+				_1: A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%e %B, %Y', date)
+			}))));
+		});
+	var _johannth$what_to_read_next$View$taskDatePickerView = F4(
+		function (today, datePicker, taskId, maybeDueDate) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -13643,12 +14067,18 @@
 					_0: function () {
 						var _p0 = maybeDueDate;
 						if (_p0.ctor === 'Just') {
-							var formattedDate = A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config.format.date, _p0._0);
+							var _p1 = A2(_johannth$what_to_read_next$View$friendlyDate, today, _p0._0);
+							var className = _p1._0;
+							var formattedDate = _p1._1;
 							return A2(
 								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('datePicker'),
+									_0: _elm_lang$html$Html_Attributes$class(
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											'datePicker',
+											A2(_elm_lang$core$Basics_ops['++'], ' ', className))),
 									_1: {ctor: '[]'}
 								},
 								{
@@ -13763,17 +14193,17 @@
 			_1: {ctor: '[]'}
 		});
 	var _johannth$what_to_read_next$View$classNameIfOnTop = F2(
-		function (maybeDropId, _p1) {
-			var _p2 = _p1;
-			var _p3 = maybeDropId;
-			if (_p3.ctor === 'Just') {
-				return (_elm_lang$core$Native_Utils.eq(_p3._0._0, _p2._0) && _elm_lang$core$Native_Utils.eq(_p3._0._2, _p2._2)) ? ' onTop' : '';
+		function (maybeDropId, _p2) {
+			var _p3 = _p2;
+			var _p4 = maybeDropId;
+			if (_p4.ctor === 'Just') {
+				return (_elm_lang$core$Native_Utils.eq(_p4._0._0, _p3._0) && _elm_lang$core$Native_Utils.eq(_p4._0._2, _p3._2)) ? ' onTop' : '';
 			} else {
 				return '';
 			}
 		});
-	var _johannth$what_to_read_next$View$taskView = F4(
-		function (datePicker, maybeDropId, index, task) {
+	var _johannth$what_to_read_next$View$taskView = F6(
+		function (today, assigneeStatusViewIsExpanded, datePicker, maybeDropId, index, task) {
 			var isHeading = A2(_elm_lang$core$String$endsWith, ':', task.name);
 			var classNames = A2(
 				_elm_lang$core$Basics_ops['++'],
@@ -13909,8 +14339,12 @@
 						} : {ctor: '[]'},
 						{
 							ctor: '::',
-							_0: A3(_johannth$what_to_read_next$View$taskDatePickerView, datePicker, task.id, task.dueOn),
-							_1: {ctor: '[]'}
+							_0: A4(_johannth$what_to_read_next$View$taskDatePickerView, today, datePicker, task.id, task.dueOn),
+							_1: {
+								ctor: '::',
+								_0: A2(_johannth$what_to_read_next$View$assigneeStatusView, assigneeStatusViewIsExpanded, task),
+								_1: {ctor: '[]'}
+							}
 						})));
 		});
 	var _johannth$what_to_read_next$View$fakeDropView = F2(
@@ -13950,26 +14384,40 @@
 				{ctor: '[]'}),
 			_1: {ctor: '[]'}
 		});
-	var _johannth$what_to_read_next$View$taskListView = F6(
-		function (hideOnEmpty, assigneeStatus, title, allTasks, maybeDropId, expanded) {
-			var tasksWithThisStatus = A2(
-				_elm_lang$core$List$filter,
-				function (_p4) {
-					var _p5 = _p4;
-					return _elm_lang$core$Native_Utils.eq(_p5._1, assigneeStatus);
-				},
-				allTasks);
+	var _johannth$what_to_read_next$View$taskListView = F9(
+		function (today, expandedAssigneeStatusOverlay, hideOnEmpty, assigneeStatus, title, allTasks, maybeDropId, expanded, sorter) {
+			var hasExpandedAssigneeStatusOverlay = function (task) {
+				return _elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$Maybe$Just(task.id),
+					expandedAssigneeStatusOverlay);
+			};
+			var tasksWithThisStatus = sorter(
+				A2(
+					_elm_lang$core$List$map,
+					function (_p5) {
+						var _p6 = _p5;
+						return {ctor: '_Tuple3', _0: _p6._0, _1: _p6._2, _2: _p6._3};
+					},
+					A2(
+						_elm_lang$core$List$filter,
+						function (_p7) {
+							var _p8 = _p7;
+							return _elm_lang$core$Native_Utils.eq(_p8._1, assigneeStatus);
+						},
+						allTasks)));
 			var taskViews = A2(
 				_elm_lang$core$List$map,
-				function (_p6) {
-					var _p7 = _p6;
-					var _p8 = _p7._2;
-					return A4(
+				function (_p9) {
+					var _p10 = _p9;
+					var _p11 = _p10._1;
+					return A6(
 						_johannth$what_to_read_next$View$taskView,
-						_p7._3,
+						today,
+						hasExpandedAssigneeStatusOverlay(_p11),
+						_p10._2,
 						maybeDropId,
-						{ctor: '_Tuple3', _0: assigneeStatus, _1: _p8.id, _2: _p7._0},
-						_p8);
+						{ctor: '_Tuple3', _0: assigneeStatus, _1: _p11.id, _2: _p10._0},
+						_p11);
 				},
 				tasksWithThisStatus);
 			var dropView = A2(
@@ -14198,18 +14646,18 @@
 		function (allTasks, datePickers, taskList) {
 			return A2(
 				_elm_lang$core$List$filterMap,
-				function (_p9) {
-					var _p10 = _p9;
-					var _p13 = _p10._1;
-					var _p11 = {
+				function (_p12) {
+					var _p13 = _p12;
+					var _p16 = _p13._1;
+					var _p14 = {
 						ctor: '_Tuple2',
-						_0: A2(_elm_lang$core$Dict$get, _p13, allTasks),
-						_1: A2(_elm_lang$core$Dict$get, _p13, datePickers)
+						_0: A2(_elm_lang$core$Dict$get, _p16, allTasks),
+						_1: A2(_elm_lang$core$Dict$get, _p16, datePickers)
 					};
-					if (((_p11.ctor === '_Tuple2') && (_p11._0.ctor === 'Just')) && (_p11._1.ctor === 'Just')) {
-						var _p12 = _p11._0._0;
+					if (((_p14.ctor === '_Tuple2') && (_p14._0.ctor === 'Just')) && (_p14._1.ctor === 'Just')) {
+						var _p15 = _p14._0._0;
 						return _elm_lang$core$Maybe$Just(
-							{ctor: '_Tuple4', _0: _p10._0, _1: _p12.assigneeStatus, _2: _p12, _3: _p11._1._0});
+							{ctor: '_Tuple4', _0: _p13._0, _1: _p15.assigneeStatus, _2: _p15, _3: _p14._1._0});
 					} else {
 						return _elm_lang$core$Maybe$Nothing;
 					}
@@ -14222,30 +14670,44 @@
 						}),
 					taskList));
 		});
-	var _johannth$what_to_read_next$View$tasksView = function (_p14) {
-		var _p15 = _p14;
-		var _p16 = _p15.expanded;
-		var dropId = _norpan$elm_html5_drag_drop$Html5_DragDrop$getDropId(_p15.dragDrop);
+	var _johannth$what_to_read_next$View$tasksView = function (_p17) {
+		var _p18 = _p17;
+		var _p23 = _p18.today;
+		var _p22 = _p18.expandedAssigneeStatusOverlay;
+		var _p21 = _p18.expanded;
+		var sortByDate = _elm_lang$core$List$sortBy(
+			function (_p19) {
+				var _p20 = _p19;
+				return {
+					ctor: '_Tuple2',
+					_0: A2(
+						_elm_lang$core$Maybe$withDefault,
+						0,
+						A2(_elm_lang$core$Maybe$map, _elm_lang$core$Date$toTime, _p20._1.dueOn)),
+					_1: _p20._0
+				};
+			});
+		var dropId = _norpan$elm_html5_drag_drop$Html5_DragDrop$getDropId(_p18.dragDrop);
 		var allTasksWithIndexAndCategory = A3(
 			_johannth$what_to_read_next$View$expandTasks,
-			_p15.tasks,
-			_p15.datePickers,
-			_elm_lang$core$Array$toList(_p15.taskList));
+			_p18.tasks,
+			_p18.datePickers,
+			_elm_lang$core$Array$toList(_p18.taskList));
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
 			{
 				ctor: '::',
-				_0: A6(_johannth$what_to_read_next$View$taskListView, true, _johannth$what_to_read_next$Types$New, 'New', allTasksWithIndexAndCategory, dropId, _p16.$new),
+				_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, true, _johannth$what_to_read_next$Types$New, 'New', allTasksWithIndexAndCategory, dropId, _p21.$new, _elm_lang$core$Basics$identity),
 				_1: {
 					ctor: '::',
-					_0: A6(_johannth$what_to_read_next$View$taskListView, false, _johannth$what_to_read_next$Types$Today, 'Today', allTasksWithIndexAndCategory, dropId, _p16.today),
+					_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Today, 'Today', allTasksWithIndexAndCategory, dropId, _p21.today, _elm_lang$core$Basics$identity),
 					_1: {
 						ctor: '::',
-						_0: A6(_johannth$what_to_read_next$View$taskListView, false, _johannth$what_to_read_next$Types$Upcoming, 'Upcoming', allTasksWithIndexAndCategory, dropId, _p16.upcoming),
+						_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Upcoming, 'Upcoming', allTasksWithIndexAndCategory, dropId, _p21.upcoming, sortByDate),
 						_1: {
 							ctor: '::',
-							_0: A6(_johannth$what_to_read_next$View$taskListView, false, _johannth$what_to_read_next$Types$Later, 'Later', allTasksWithIndexAndCategory, dropId, _p16.later),
+							_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Later, 'Later', allTasksWithIndexAndCategory, dropId, _p21.later, sortByDate),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -14348,8 +14810,13 @@
 								return A2(
 									_elm_lang$core$Json_Decode$andThen,
 									function (buildVersion) {
-										return _elm_lang$core$Json_Decode$succeed(
-											{apiHost: apiHost, buildTier: buildTier, buildTime: buildTime, buildVersion: buildVersion});
+										return A2(
+											_elm_lang$core$Json_Decode$andThen,
+											function (today) {
+												return _elm_lang$core$Json_Decode$succeed(
+													{apiHost: apiHost, buildTier: buildTier, buildTime: buildTime, buildVersion: buildVersion, today: today});
+											},
+											A2(_elm_lang$core$Json_Decode$field, 'today', _elm_lang$core$Json_Decode$float));
 									},
 									A2(_elm_lang$core$Json_Decode$field, 'buildVersion', _elm_lang$core$Json_Decode$string));
 							},
@@ -14443,8 +14910,9 @@
 	var Elm = __webpack_require__(1);
 	var mountNode = document.getElementById('app');
 	var app = Elm.Main.embed(mountNode, {
-	  buildVersion: ("43be07b9bbe24c17320e43420a9d0ce9f0f8bc27\n"),
-	  buildTime: ("2017-04-19T12:57:39.634Z"),
+	  today: Date.now(),
+	  buildVersion: ("3b6801e180641d7f8dcc1194239f22e372c3d931\n"),
+	  buildTime: ("2017-04-19T14:21:55.033Z"),
 	  buildTier: ("production"),
 	  apiHost: ("https://asana-inbox.herokuapp.com"),
 	});
