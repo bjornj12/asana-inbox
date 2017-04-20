@@ -10164,6 +10164,137 @@
 	};
 	var _elm_lang$core$Regex$All = {ctor: 'All'};
 	
+	var _elm_lang$core$Set$foldr = F3(
+		function (f, b, _p0) {
+			var _p1 = _p0;
+			return A3(
+				_elm_lang$core$Dict$foldr,
+				F3(
+					function (k, _p2, b) {
+						return A2(f, k, b);
+					}),
+				b,
+				_p1._0);
+		});
+	var _elm_lang$core$Set$foldl = F3(
+		function (f, b, _p3) {
+			var _p4 = _p3;
+			return A3(
+				_elm_lang$core$Dict$foldl,
+				F3(
+					function (k, _p5, b) {
+						return A2(f, k, b);
+					}),
+				b,
+				_p4._0);
+		});
+	var _elm_lang$core$Set$toList = function (_p6) {
+		var _p7 = _p6;
+		return _elm_lang$core$Dict$keys(_p7._0);
+	};
+	var _elm_lang$core$Set$size = function (_p8) {
+		var _p9 = _p8;
+		return _elm_lang$core$Dict$size(_p9._0);
+	};
+	var _elm_lang$core$Set$member = F2(
+		function (k, _p10) {
+			var _p11 = _p10;
+			return A2(_elm_lang$core$Dict$member, k, _p11._0);
+		});
+	var _elm_lang$core$Set$isEmpty = function (_p12) {
+		var _p13 = _p12;
+		return _elm_lang$core$Dict$isEmpty(_p13._0);
+	};
+	var _elm_lang$core$Set$Set_elm_builtin = function (a) {
+		return {ctor: 'Set_elm_builtin', _0: a};
+	};
+	var _elm_lang$core$Set$empty = _elm_lang$core$Set$Set_elm_builtin(_elm_lang$core$Dict$empty);
+	var _elm_lang$core$Set$singleton = function (k) {
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(
+				_elm_lang$core$Dict$singleton,
+				k,
+				{ctor: '_Tuple0'}));
+	};
+	var _elm_lang$core$Set$insert = F2(
+		function (k, _p14) {
+			var _p15 = _p14;
+			return _elm_lang$core$Set$Set_elm_builtin(
+				A3(
+					_elm_lang$core$Dict$insert,
+					k,
+					{ctor: '_Tuple0'},
+					_p15._0));
+		});
+	var _elm_lang$core$Set$fromList = function (xs) {
+		return A3(_elm_lang$core$List$foldl, _elm_lang$core$Set$insert, _elm_lang$core$Set$empty, xs);
+	};
+	var _elm_lang$core$Set$map = F2(
+		function (f, s) {
+			return _elm_lang$core$Set$fromList(
+				A2(
+					_elm_lang$core$List$map,
+					f,
+					_elm_lang$core$Set$toList(s)));
+		});
+	var _elm_lang$core$Set$remove = F2(
+		function (k, _p16) {
+			var _p17 = _p16;
+			return _elm_lang$core$Set$Set_elm_builtin(
+				A2(_elm_lang$core$Dict$remove, k, _p17._0));
+		});
+	var _elm_lang$core$Set$union = F2(
+		function (_p19, _p18) {
+			var _p20 = _p19;
+			var _p21 = _p18;
+			return _elm_lang$core$Set$Set_elm_builtin(
+				A2(_elm_lang$core$Dict$union, _p20._0, _p21._0));
+		});
+	var _elm_lang$core$Set$intersect = F2(
+		function (_p23, _p22) {
+			var _p24 = _p23;
+			var _p25 = _p22;
+			return _elm_lang$core$Set$Set_elm_builtin(
+				A2(_elm_lang$core$Dict$intersect, _p24._0, _p25._0));
+		});
+	var _elm_lang$core$Set$diff = F2(
+		function (_p27, _p26) {
+			var _p28 = _p27;
+			var _p29 = _p26;
+			return _elm_lang$core$Set$Set_elm_builtin(
+				A2(_elm_lang$core$Dict$diff, _p28._0, _p29._0));
+		});
+	var _elm_lang$core$Set$filter = F2(
+		function (p, _p30) {
+			var _p31 = _p30;
+			return _elm_lang$core$Set$Set_elm_builtin(
+				A2(
+					_elm_lang$core$Dict$filter,
+					F2(
+						function (k, _p32) {
+							return p(k);
+						}),
+					_p31._0));
+		});
+	var _elm_lang$core$Set$partition = F2(
+		function (p, _p33) {
+			var _p34 = _p33;
+			var _p35 = A2(
+				_elm_lang$core$Dict$partition,
+				F2(
+					function (k, _p36) {
+						return p(k);
+					}),
+				_p34._0);
+			var p1 = _p35._0;
+			var p2 = _p35._1;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Set$Set_elm_builtin(p1),
+				_1: _elm_lang$core$Set$Set_elm_builtin(p2)
+			};
+		});
+	
 	var _elm_lang$dom$Native_Dom = function() {
 	
 	var fakeNode = {
@@ -11659,8 +11790,8 @@
 				return _elm_lang$core$Maybe$Nothing;
 			}
 		});
-	var _johannth$what_to_read_next$LocalStorage$setItem = _elm_lang$core$Native_Platform.outgoingPort(
-		'setItem',
+	var _johannth$what_to_read_next$LocalStorage$setItemRaw = _elm_lang$core$Native_Platform.outgoingPort(
+		'setItemRaw',
 		function (v) {
 			return {
 				key: v.key,
@@ -11702,13 +11833,15 @@
 		function (a, b) {
 			return {key: a, value: b};
 		});
-	var _johannth$what_to_read_next$LocalStorage$encodeToItem = F2(
-		function (key, value) {
-			return A2(
-				_johannth$what_to_read_next$LocalStorage$LocalStorageItem,
-				key,
-				_elm_lang$core$Maybe$Just(
-					A2(_elm_lang$core$Json_Encode$encode, 0, value)));
+	var _johannth$what_to_read_next$LocalStorage$setItem = F3(
+		function (key, value, encoder) {
+			var encodedValue = encoder(value);
+			return _johannth$what_to_read_next$LocalStorage$setItemRaw(
+				A2(
+					_johannth$what_to_read_next$LocalStorage$LocalStorageItem,
+					key,
+					_elm_lang$core$Maybe$Just(
+						A2(_elm_lang$core$Json_Encode$encode, 0, encodedValue))));
 		});
 	
 	var _johannth$what_to_read_next$Types$AsanaAccessToken = F2(
@@ -13237,6 +13370,7 @@
 	var _johannth$what_to_read_next$State$titleInputId = function (taskId) {
 		return A2(_elm_lang$core$Basics_ops['++'], 'taskTitle', taskId);
 	};
+	var _johannth$what_to_read_next$State$taskListStorageKey = 'taskList';
 	var _johannth$what_to_read_next$State$defaultWorkspaceStorageKey = 'defaultWorkspace';
 	var _johannth$what_to_read_next$State$accessTokensStorageKey = 'accessTokens';
 	var _johannth$what_to_read_next$State$init = F2(
@@ -13247,7 +13381,11 @@
 				_1: {
 					ctor: '::',
 					_0: _johannth$what_to_read_next$LocalStorage$getItem(_johannth$what_to_read_next$State$defaultWorkspaceStorageKey),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _johannth$what_to_read_next$LocalStorage$getItem(_johannth$what_to_read_next$State$taskListStorageKey),
+						_1: {ctor: '[]'}
+					}
 				}
 			};
 			var initialModel = {
@@ -13270,11 +13408,7 @@
 			return A2(_elm_lang$core$Platform_Cmd_ops['!'], initialModel, initialCommands);
 		});
 	var _johannth$what_to_read_next$State$saveApiTokens = function (accessTokens) {
-		return _johannth$what_to_read_next$LocalStorage$setItem(
-			A2(
-				_johannth$what_to_read_next$LocalStorage$encodeToItem,
-				_johannth$what_to_read_next$State$accessTokensStorageKey,
-				_johannth$what_to_read_next$Api$encodeAccessTokens(accessTokens)));
+		return A3(_johannth$what_to_read_next$LocalStorage$setItem, _johannth$what_to_read_next$State$accessTokensStorageKey, accessTokens, _johannth$what_to_read_next$Api$encodeAccessTokens);
 	};
 	var _johannth$what_to_read_next$State$update = F2(
 		function (msg, model) {
@@ -13336,10 +13470,28 @@
 									{ctor: '[]'});
 							}
 						} else {
-							return A2(
-								_elm_lang$core$Platform_Cmd_ops['!'],
-								model,
-								{ctor: '[]'});
+							if (_elm_lang$core$Native_Utils.eq(_p13.key, _johannth$what_to_read_next$State$taskListStorageKey)) {
+								var taskList = A2(
+									_elm_lang$core$Maybe$withDefault,
+									{ctor: '[]'},
+									A2(
+										_johannth$what_to_read_next$LocalStorage$decodeToType,
+										_p13,
+										_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									_elm_lang$core$Native_Utils.update(
+										model,
+										{
+											taskList: _elm_lang$core$Array$fromList(taskList)
+										}),
+									{ctor: '[]'});
+							} else {
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									model,
+									{ctor: '[]'});
+							}
 						}
 					}
 				case 'ToggleAccessTokenForm':
@@ -13438,12 +13590,18 @@
 							_elm_lang$core$Dict$values(tasks));
 						var datePickers = _p14._0;
 						var datePickerFx = _p14._1;
-						var taskList = A2(
-							_elm_lang$core$List$map,
-							function (_) {
-								return _.id;
+						var currentlySortedTaskIds = _elm_lang$core$Set$fromList(
+							_elm_lang$core$Array$toList(model.taskList));
+						var unsortedIds = A2(
+							_elm_lang$core$List$filterMap,
+							function (task) {
+								return (!A2(_elm_lang$core$Set$member, task.id, currentlySortedTaskIds)) ? _elm_lang$core$Maybe$Just(task.id) : _elm_lang$core$Maybe$Nothing;
 							},
 							_p15);
+						var taskList = A2(
+							_elm_lang$core$Basics_ops['++'],
+							unsortedIds,
+							_elm_lang$core$Array$toList(model.taskList));
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -13467,11 +13625,7 @@
 							}),
 						{
 							ctor: '::',
-							_0: _johannth$what_to_read_next$LocalStorage$setItem(
-								A2(
-									_johannth$what_to_read_next$LocalStorage$encodeToItem,
-									_johannth$what_to_read_next$State$defaultWorkspaceStorageKey,
-									_elm_lang$core$Json_Encode$string(_p16))),
+							_0: A3(_johannth$what_to_read_next$LocalStorage$setItem, _johannth$what_to_read_next$State$defaultWorkspaceStorageKey, _p16, _elm_lang$core$Json_Encode$string),
 							_1: {ctor: '[]'}
 						});
 				case 'ToggleExpanded':
@@ -13760,14 +13914,29 @@
 					var taskList = _p36._0;
 					var tasks = _p36._1;
 					var commands = _p36._2;
+					var updatedModel = _elm_lang$core$Native_Utils.update(
+						model,
+						{dragDrop: model_, taskList: taskList, tasks: tasks});
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{dragDrop: model_, taskList: taskList, tasks: tasks}),
-						commands);
+						updatedModel,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							commands,
+							{
+								ctor: '::',
+								_0: A3(
+									_johannth$what_to_read_next$LocalStorage$setItem,
+									_johannth$what_to_read_next$State$taskListStorageKey,
+									_elm_lang$core$Array$toList(updatedModel.taskList),
+									function (_p41) {
+										return _elm_lang$core$Json_Encode$list(
+											A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p41));
+									}),
+								_1: {ctor: '[]'}
+							}));
 				case 'ToggleAssigneeStatusOverlay':
-					var _p41 = _p9._0;
+					var _p42 = _p9._0;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
@@ -13775,24 +13944,24 @@
 							{
 								expandedAssigneeStatusOverlay: _elm_lang$core$Native_Utils.eq(
 									model.expandedAssigneeStatusOverlay,
-									_elm_lang$core$Maybe$Just(_p41)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p41)
+									_elm_lang$core$Maybe$Just(_p42)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p42)
 							}),
 						{ctor: '[]'});
 				default:
-					var _p45 = _p9._0;
-					var _p44 = _p9._1;
-					var _p42 = A2(_elm_lang$core$Dict$get, _p45, model.tasks);
-					if (_p42.ctor === 'Just') {
-						var _p43 = _p42._0;
+					var _p46 = _p9._0;
+					var _p45 = _p9._1;
+					var _p43 = A2(_elm_lang$core$Dict$get, _p46, model.tasks);
+					if (_p43.ctor === 'Just') {
+						var _p44 = _p43._0;
 						var updatedTask = _elm_lang$core$Native_Utils.update(
-							_p43,
-							{assigneeStatus: _p44});
+							_p44,
+							{assigneeStatus: _p45});
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									tasks: A3(_elm_lang$core$Dict$insert, _p45, updatedTask, model.tasks),
+									tasks: A3(_elm_lang$core$Dict$insert, _p46, updatedTask, model.tasks),
 									expandedAssigneeStatusOverlay: _elm_lang$core$Maybe$Nothing
 								}),
 							{
@@ -13801,8 +13970,8 @@
 									_johannth$what_to_read_next$Api$updateTask,
 									model.apiHost,
 									model.accessTokens,
-									_p43,
-									_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p44)),
+									_p44,
+									_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p45)),
 								_1: {ctor: '[]'}
 							});
 					} else {
@@ -14852,9 +15021,10 @@
 		});
 	var _johannth$what_to_read_next$View$tasksView = function (_p17) {
 		var _p18 = _p17;
-		var _p23 = _p18.today;
-		var _p22 = _p18.expandedAssigneeStatusOverlay;
-		var _p21 = _p18.expanded;
+		var _p26 = _p18.today;
+		var _p25 = _p18.taskList;
+		var _p24 = _p18.expandedAssigneeStatusOverlay;
+		var _p23 = _p18.expanded;
 		var sortByDate = _elm_lang$core$List$sortBy(
 			function (_p19) {
 				var _p20 = _p19;
@@ -14867,12 +15037,28 @@
 					_1: _p20._0
 				};
 			});
+		var preferredOrder = _elm_lang$core$Dict$fromList(
+			A2(
+				_elm_lang$core$List$indexedMap,
+				F2(
+					function (index, taskId) {
+						return {ctor: '_Tuple2', _0: taskId, _1: index};
+					}),
+				_elm_lang$core$Array$toList(_p25)));
+		var sortByPreferred = _elm_lang$core$List$sortBy(
+			function (_p21) {
+				var _p22 = _p21;
+				return A2(
+					_elm_lang$core$Maybe$withDefault,
+					0,
+					A2(_elm_lang$core$Dict$get, _p22._1.id, preferredOrder));
+			});
 		var dropId = _norpan$elm_html5_drag_drop$Html5_DragDrop$getDropId(_p18.dragDrop);
 		var allTasksWithIndexAndCategory = A3(
 			_johannth$what_to_read_next$View$expandTasks,
 			_p18.tasks,
 			_p18.datePickers,
-			_elm_lang$core$Array$toList(_p18.taskList));
+			_elm_lang$core$Array$toList(_p25));
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
@@ -14896,16 +15082,16 @@
 						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, true, _johannth$what_to_read_next$Types$New, 'New', allTasksWithIndexAndCategory, dropId, _p21.$new, _elm_lang$core$Basics$identity),
+							_0: A9(_johannth$what_to_read_next$View$taskListView, _p26, _p24, true, _johannth$what_to_read_next$Types$New, 'New', allTasksWithIndexAndCategory, dropId, _p23.$new, _elm_lang$core$Basics$identity),
 							_1: {
 								ctor: '::',
-								_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Today, 'Today', allTasksWithIndexAndCategory, dropId, _p21.today, _elm_lang$core$Basics$identity),
+								_0: A9(_johannth$what_to_read_next$View$taskListView, _p26, _p24, false, _johannth$what_to_read_next$Types$Today, 'Today', allTasksWithIndexAndCategory, dropId, _p23.today, sortByPreferred),
 								_1: {
 									ctor: '::',
-									_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Upcoming, 'Upcoming', allTasksWithIndexAndCategory, dropId, _p21.upcoming, sortByDate),
+									_0: A9(_johannth$what_to_read_next$View$taskListView, _p26, _p24, false, _johannth$what_to_read_next$Types$Upcoming, 'Upcoming', allTasksWithIndexAndCategory, dropId, _p23.upcoming, sortByDate),
 									_1: {
 										ctor: '::',
-										_0: A9(_johannth$what_to_read_next$View$taskListView, _p23, _p22, false, _johannth$what_to_read_next$Types$Later, 'Later', allTasksWithIndexAndCategory, dropId, _p21.later, sortByDate),
+										_0: A9(_johannth$what_to_read_next$View$taskListView, _p26, _p24, false, _johannth$what_to_read_next$Types$Later, 'Later', allTasksWithIndexAndCategory, dropId, _p23.later, sortByDate),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -14917,7 +15103,7 @@
 	};
 	var _johannth$what_to_read_next$View$rootView = function (model) {
 		var hasNoTasks = _elm_lang$core$Native_Utils.eq(
-			_elm_lang$core$Array$length(model.taskList),
+			_elm_lang$core$Dict$size(model.tasks),
 			0);
 		var isLoading = hasNoTasks && (!_elm_lang$core$Native_Utils.eq(
 			_elm_lang$core$List$length(model.accessTokens),
@@ -15112,13 +15298,13 @@
 	var mountNode = document.getElementById('app');
 	var app = Elm.Main.embed(mountNode, {
 	  today: Date.now(),
-	  buildVersion: ("94131d94a394f86abe1613139aa892bbe358ddd6\n"),
-	  buildTime: ("2017-04-19T17:56:51.102Z"),
+	  buildVersion: ("6919b5b762ccea05569724e8d8881c95ccc88665\n"),
+	  buildTime: ("2017-04-20T11:03:34.477Z"),
 	  buildTier: ("production"),
 	  apiHost: ("https://asana-inbox.herokuapp.com"),
 	});
 	
-	app.ports.setItem.subscribe(function(item) {
+	app.ports.setItemRaw.subscribe(function(item) {
 	  localStorage.setItem(item.key, item.value);
 	});
 	
