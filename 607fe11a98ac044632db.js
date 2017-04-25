@@ -10164,137 +10164,6 @@
 	};
 	var _elm_lang$core$Regex$All = {ctor: 'All'};
 	
-	var _elm_lang$core$Set$foldr = F3(
-		function (f, b, _p0) {
-			var _p1 = _p0;
-			return A3(
-				_elm_lang$core$Dict$foldr,
-				F3(
-					function (k, _p2, b) {
-						return A2(f, k, b);
-					}),
-				b,
-				_p1._0);
-		});
-	var _elm_lang$core$Set$foldl = F3(
-		function (f, b, _p3) {
-			var _p4 = _p3;
-			return A3(
-				_elm_lang$core$Dict$foldl,
-				F3(
-					function (k, _p5, b) {
-						return A2(f, k, b);
-					}),
-				b,
-				_p4._0);
-		});
-	var _elm_lang$core$Set$toList = function (_p6) {
-		var _p7 = _p6;
-		return _elm_lang$core$Dict$keys(_p7._0);
-	};
-	var _elm_lang$core$Set$size = function (_p8) {
-		var _p9 = _p8;
-		return _elm_lang$core$Dict$size(_p9._0);
-	};
-	var _elm_lang$core$Set$member = F2(
-		function (k, _p10) {
-			var _p11 = _p10;
-			return A2(_elm_lang$core$Dict$member, k, _p11._0);
-		});
-	var _elm_lang$core$Set$isEmpty = function (_p12) {
-		var _p13 = _p12;
-		return _elm_lang$core$Dict$isEmpty(_p13._0);
-	};
-	var _elm_lang$core$Set$Set_elm_builtin = function (a) {
-		return {ctor: 'Set_elm_builtin', _0: a};
-	};
-	var _elm_lang$core$Set$empty = _elm_lang$core$Set$Set_elm_builtin(_elm_lang$core$Dict$empty);
-	var _elm_lang$core$Set$singleton = function (k) {
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(
-				_elm_lang$core$Dict$singleton,
-				k,
-				{ctor: '_Tuple0'}));
-	};
-	var _elm_lang$core$Set$insert = F2(
-		function (k, _p14) {
-			var _p15 = _p14;
-			return _elm_lang$core$Set$Set_elm_builtin(
-				A3(
-					_elm_lang$core$Dict$insert,
-					k,
-					{ctor: '_Tuple0'},
-					_p15._0));
-		});
-	var _elm_lang$core$Set$fromList = function (xs) {
-		return A3(_elm_lang$core$List$foldl, _elm_lang$core$Set$insert, _elm_lang$core$Set$empty, xs);
-	};
-	var _elm_lang$core$Set$map = F2(
-		function (f, s) {
-			return _elm_lang$core$Set$fromList(
-				A2(
-					_elm_lang$core$List$map,
-					f,
-					_elm_lang$core$Set$toList(s)));
-		});
-	var _elm_lang$core$Set$remove = F2(
-		function (k, _p16) {
-			var _p17 = _p16;
-			return _elm_lang$core$Set$Set_elm_builtin(
-				A2(_elm_lang$core$Dict$remove, k, _p17._0));
-		});
-	var _elm_lang$core$Set$union = F2(
-		function (_p19, _p18) {
-			var _p20 = _p19;
-			var _p21 = _p18;
-			return _elm_lang$core$Set$Set_elm_builtin(
-				A2(_elm_lang$core$Dict$union, _p20._0, _p21._0));
-		});
-	var _elm_lang$core$Set$intersect = F2(
-		function (_p23, _p22) {
-			var _p24 = _p23;
-			var _p25 = _p22;
-			return _elm_lang$core$Set$Set_elm_builtin(
-				A2(_elm_lang$core$Dict$intersect, _p24._0, _p25._0));
-		});
-	var _elm_lang$core$Set$diff = F2(
-		function (_p27, _p26) {
-			var _p28 = _p27;
-			var _p29 = _p26;
-			return _elm_lang$core$Set$Set_elm_builtin(
-				A2(_elm_lang$core$Dict$diff, _p28._0, _p29._0));
-		});
-	var _elm_lang$core$Set$filter = F2(
-		function (p, _p30) {
-			var _p31 = _p30;
-			return _elm_lang$core$Set$Set_elm_builtin(
-				A2(
-					_elm_lang$core$Dict$filter,
-					F2(
-						function (k, _p32) {
-							return p(k);
-						}),
-					_p31._0));
-		});
-	var _elm_lang$core$Set$partition = F2(
-		function (p, _p33) {
-			var _p34 = _p33;
-			var _p35 = A2(
-				_elm_lang$core$Dict$partition,
-				F2(
-					function (k, _p36) {
-						return p(k);
-					}),
-				_p34._0);
-			var p1 = _p35._0;
-			var p2 = _p35._1;
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Set$Set_elm_builtin(p1),
-				_1: _elm_lang$core$Set$Set_elm_builtin(p2)
-			};
-		});
-	
 	var _elm_lang$dom$Native_Dom = function() {
 	
 	var fakeNode = {
@@ -13415,62 +13284,85 @@
 				var _p2 = dropTarget;
 				switch (_p2.ctor) {
 					case 'Before':
+						var _p4 = _p2._1;
 						return {
-							ctor: '_Tuple2',
+							ctor: '_Tuple3',
 							_0: _p2._0,
-							_1: F2(
+							_1: _elm_lang$core$Maybe$Just(_p4),
+							_2: F2(
 								function (taskIdToInsert, taskIds) {
-									return A2(
-										_elm_lang$core$List$concatMap,
-										function (taskId) {
-											return _elm_lang$core$Native_Utils.eq(taskId, _p2._1) ? {
-												ctor: '::',
-												_0: taskIdToInsert,
-												_1: {
+									var _p3 = taskIds;
+									if (_p3.ctor === '[]') {
+										return {
+											ctor: '::',
+											_0: taskIdToInsert,
+											_1: {ctor: '[]'}
+										};
+									} else {
+										return A2(
+											_elm_lang$core$List$concatMap,
+											function (taskId) {
+												return _elm_lang$core$Native_Utils.eq(taskId, _p4) ? {
+													ctor: '::',
+													_0: taskIdToInsert,
+													_1: {
+														ctor: '::',
+														_0: taskId,
+														_1: {ctor: '[]'}
+													}
+												} : {
 													ctor: '::',
 													_0: taskId,
 													_1: {ctor: '[]'}
-												}
-											} : {
-												ctor: '::',
-												_0: taskId,
-												_1: {ctor: '[]'}
-											};
-										},
-										taskIds);
+												};
+											},
+											taskIds);
+									}
 								})
 						};
 					case 'After':
+						var _p6 = _p2._1;
 						return {
-							ctor: '_Tuple2',
+							ctor: '_Tuple3',
 							_0: _p2._0,
-							_1: F2(
+							_1: _elm_lang$core$Maybe$Just(_p6),
+							_2: F2(
 								function (taskIdToInsert, taskIds) {
-									return A2(
-										_elm_lang$core$List$concatMap,
-										function (taskId) {
-											return _elm_lang$core$Native_Utils.eq(taskId, _p2._1) ? {
-												ctor: '::',
-												_0: taskId,
-												_1: {
+									var _p5 = taskIds;
+									if (_p5.ctor === '[]') {
+										return {
+											ctor: '::',
+											_0: taskIdToInsert,
+											_1: {ctor: '[]'}
+										};
+									} else {
+										return A2(
+											_elm_lang$core$List$concatMap,
+											function (taskId) {
+												return _elm_lang$core$Native_Utils.eq(taskId, _p6) ? {
 													ctor: '::',
-													_0: taskIdToInsert,
+													_0: taskId,
+													_1: {
+														ctor: '::',
+														_0: taskIdToInsert,
+														_1: {ctor: '[]'}
+													}
+												} : {
+													ctor: '::',
+													_0: taskId,
 													_1: {ctor: '[]'}
-												}
-											} : {
-												ctor: '::',
-												_0: taskId,
-												_1: {ctor: '[]'}
-											};
-										},
-										taskIds);
+												};
+											},
+											taskIds);
+									}
 								})
 						};
 					default:
 						return {
-							ctor: '_Tuple2',
+							ctor: '_Tuple3',
 							_0: _p2._0,
-							_1: F2(
+							_1: _elm_lang$core$Maybe$Nothing,
+							_2: F2(
 								function (taskIdToInsert, taskIds) {
 									return A2(
 										_elm_lang$core$Basics_ops['++'],
@@ -13485,8 +13377,11 @@
 				}
 			}();
 			var dropAssigneeStatus = _p1._0;
-			var inserter = _p1._1;
-			return A4(
+			var maybeDropTaskId = _p1._1;
+			var inserter = _p1._2;
+			return _elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$Maybe$Just(dragTarget.targetId),
+				maybeDropTaskId) ? taskList : A4(
 				_johannth$what_to_read_next$State$insertIdIntoTaskList,
 				dropAssigneeStatus,
 				dragTarget.targetId,
@@ -13495,20 +13390,20 @@
 		});
 	var _johannth$what_to_read_next$State$moveTaskInTaskList = F3(
 		function (dragTarget, dropTarget, maybeTaskList) {
-			var _p3 = maybeTaskList;
-			if (_p3.ctor === 'Just') {
+			var _p7 = maybeTaskList;
+			if (_p7.ctor === 'Just') {
 				return _elm_lang$core$Maybe$Just(
-					A3(_johannth$what_to_read_next$State$moveTaskInTaskList_, dragTarget, dropTarget, _p3._0));
+					A3(_johannth$what_to_read_next$State$moveTaskInTaskList_, dragTarget, dropTarget, _p7._0));
 			} else {
 				return _elm_lang$core$Maybe$Nothing;
 			}
 		});
 	var _johannth$what_to_read_next$State$updateAssigneeStatus = F3(
 		function (taskId, assigneeStatus, tasks) {
-			var _p4 = A2(_elm_lang$core$Dict$get, taskId, tasks);
-			if (_p4.ctor === 'Just') {
+			var _p8 = A2(_elm_lang$core$Dict$get, taskId, tasks);
+			if (_p8.ctor === 'Just') {
 				var updatedTask = _elm_lang$core$Native_Utils.update(
-					_p4._0,
+					_p8._0,
 					{assigneeStatus: assigneeStatus});
 				return A3(_elm_lang$core$Dict$insert, taskId, updatedTask, tasks);
 			} else {
@@ -13517,8 +13412,8 @@
 		});
 	var _johannth$what_to_read_next$State$toggleExpandedState = F2(
 		function (assigneeStatus, currentState) {
-			var _p5 = assigneeStatus;
-			switch (_p5.ctor) {
+			var _p9 = assigneeStatus;
+			switch (_p9.ctor) {
 				case 'Today':
 					return _elm_lang$core$Native_Utils.update(
 						currentState,
@@ -13544,9 +13439,9 @@
 				var settings = _elm_lang$core$Native_Utils.update(
 					_elm_community$elm_datepicker$DatePicker$defaultSettings,
 					{pickedDate: task.dueOn});
-				var _p6 = _elm_community$elm_datepicker$DatePicker$init(settings);
-				var datePicker = _p6._0;
-				var datePickerFx = _p6._1;
+				var _p10 = _elm_community$elm_datepicker$DatePicker$init(settings);
+				var datePicker = _p10._0;
+				var datePickerFx = _p10._1;
 				return {
 					ctor: '_Tuple3',
 					_0: task.id,
@@ -13561,16 +13456,16 @@
 		var datePickers = _elm_lang$core$Dict$fromList(
 			A2(
 				_elm_lang$core$List$map,
-				function (_p7) {
-					var _p8 = _p7;
-					return {ctor: '_Tuple2', _0: _p8._0, _1: _p8._1};
+				function (_p11) {
+					var _p12 = _p11;
+					return {ctor: '_Tuple2', _0: _p12._0, _1: _p12._1};
 				},
 				everyThing));
 		var effects = A2(
 			_elm_lang$core$List$map,
-			function (_p9) {
-				var _p10 = _p9;
-				return _p10._2;
+			function (_p13) {
+				var _p14 = _p13;
+				return _p14._2;
 			},
 			everyThing);
 		return {ctor: '_Tuple2', _0: datePickers, _1: effects};
@@ -13580,9 +13475,9 @@
 	};
 	var _johannth$what_to_read_next$State$taskListStorageKey = 'taskList';
 	var _johannth$what_to_read_next$State$saveTaskList = function (maybeTaskList) {
-		var _p11 = maybeTaskList;
-		if (_p11.ctor === 'Just') {
-			return A3(_johannth$what_to_read_next$LocalStorage$setItem, _johannth$what_to_read_next$State$taskListStorageKey, _p11._0, _johannth$what_to_read_next$Api$encodeTaskList);
+		var _p15 = maybeTaskList;
+		if (_p15.ctor === 'Just') {
+			return A3(_johannth$what_to_read_next$LocalStorage$setItem, _johannth$what_to_read_next$State$taskListStorageKey, _p15._0, _johannth$what_to_read_next$Api$encodeTaskList);
 		} else {
 			return _elm_lang$core$Platform_Cmd$none;
 		}
@@ -13628,8 +13523,8 @@
 	};
 	var _johannth$what_to_read_next$State$update = F2(
 		function (msg, model) {
-			var _p12 = msg;
-			switch (_p12.ctor) {
+			var _p16 = msg;
+			switch (_p16.ctor) {
 				case 'Void':
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
@@ -13646,20 +13541,20 @@
 						model,
 						{ctor: '[]'});
 				case 'ReceiveItem':
-					var _p16 = _p12._0;
-					if (_elm_lang$core$Native_Utils.eq(_p16.key, _johannth$what_to_read_next$State$accessTokensStorageKey)) {
-						var maybeAccessTokens = A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p16, _johannth$what_to_read_next$Api$decodeAccessTokens);
-						var _p13 = maybeAccessTokens;
-						if (_p13.ctor === 'Just') {
-							var _p14 = _p13._0;
+					var _p20 = _p16._0;
+					if (_elm_lang$core$Native_Utils.eq(_p20.key, _johannth$what_to_read_next$State$accessTokensStorageKey)) {
+						var maybeAccessTokens = A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p20, _johannth$what_to_read_next$Api$decodeAccessTokens);
+						var _p17 = maybeAccessTokens;
+						if (_p17.ctor === 'Just') {
+							var _p18 = _p17._0;
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
 								_elm_lang$core$Native_Utils.update(
 									model,
-									{accessTokens: _p14}),
+									{accessTokens: _p18}),
 								{
 									ctor: '::',
-									_0: A2(_johannth$what_to_read_next$Api$getTasks, model.apiHost, _p14),
+									_0: A2(_johannth$what_to_read_next$Api$getTasks, model.apiHost, _p18),
 									_1: {ctor: '[]'}
 								});
 						} else {
@@ -13669,10 +13564,10 @@
 								{ctor: '[]'});
 						}
 					} else {
-						if (_elm_lang$core$Native_Utils.eq(_p16.key, _johannth$what_to_read_next$State$defaultWorkspaceStorageKey)) {
-							var maybeDefaultWorkspace = A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p16, _elm_lang$core$Json_Decode$string);
-							var _p15 = maybeDefaultWorkspace;
-							if (_p15.ctor === 'Just') {
+						if (_elm_lang$core$Native_Utils.eq(_p20.key, _johannth$what_to_read_next$State$defaultWorkspaceStorageKey)) {
+							var maybeDefaultWorkspace = A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p20, _elm_lang$core$Json_Decode$string);
+							var _p19 = maybeDefaultWorkspace;
+							if (_p19.ctor === 'Just') {
 								return A2(
 									_elm_lang$core$Platform_Cmd_ops['!'],
 									_elm_lang$core$Native_Utils.update(
@@ -13686,8 +13581,8 @@
 									{ctor: '[]'});
 							}
 						} else {
-							if (_elm_lang$core$Native_Utils.eq(_p16.key, _johannth$what_to_read_next$State$taskListStorageKey)) {
-								var taskList = A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p16, _johannth$what_to_read_next$Api$decodeTaskList);
+							if (_elm_lang$core$Native_Utils.eq(_p20.key, _johannth$what_to_read_next$State$taskListStorageKey)) {
+								var taskList = A2(_johannth$what_to_read_next$LocalStorage$decodeToType, _p20, _johannth$what_to_read_next$Api$decodeTaskList);
 								return A2(
 									_elm_lang$core$Platform_Cmd_ops['!'],
 									_elm_lang$core$Native_Utils.update(
@@ -13714,14 +13609,14 @@
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
-							{newAccessTokenName: _p12._0}),
+							{newAccessTokenName: _p16._0}),
 						{ctor: '[]'});
 				case 'AddAccessTokenToken':
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
-							{newAccessTokenToken: _p12._0}),
+							{newAccessTokenToken: _p16._0}),
 						{ctor: '[]'});
 				case 'SaveAccessToken':
 					var newAccessToken = A2(_johannth$what_to_read_next$Types$AsanaAccessToken, model.newAccessTokenName, model.newAccessTokenToken);
@@ -13759,7 +13654,7 @@
 							accessTokens: A2(
 								_elm_lang$core$List$filter,
 								function (token) {
-									return !_elm_lang$core$Native_Utils.eq(token, _p12._0);
+									return !_elm_lang$core$Native_Utils.eq(token, _p16._0);
 								},
 								model.accessTokens)
 						});
@@ -13772,15 +13667,15 @@
 							_1: {ctor: '[]'}
 						});
 				case 'LoadTasks':
-					if (_p12._0.ctor === 'Err') {
-						var x = A2(_elm_lang$core$Debug$log, 'Error', _p12._0._0);
+					if (_p16._0.ctor === 'Err') {
+						var x = A2(_elm_lang$core$Debug$log, 'Error', _p16._0._0);
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							model,
 							{ctor: '[]'});
 					} else {
 						var sortByDate = _elm_lang$core$List$sortBy(
-							function (_p17) {
+							function (_p21) {
 								return A2(
 									_elm_lang$core$Maybe$withDefault,
 									0,
@@ -13789,7 +13684,7 @@
 										_elm_lang$core$Date$toTime,
 										function (_) {
 											return _.dueOn;
-										}(_p17)));
+										}(_p21)));
 							});
 						var currentTodayTasks = A2(
 							_elm_lang$core$Maybe$withDefault,
@@ -13818,7 +13713,7 @@
 								function (task) {
 									return {ctor: '_Tuple2', _0: task.id, _1: task};
 								},
-								_p12._0._0));
+								_p16._0._0));
 						var $new = A2(
 							_elm_lang$core$List$map,
 							function (_) {
@@ -13837,7 +13732,7 @@
 							},
 							A2(
 								_elm_lang$core$List$sortBy,
-								function (_p18) {
+								function (_p22) {
 									return A2(
 										_elm_lang$core$Maybe$withDefault,
 										-1,
@@ -13847,7 +13742,7 @@
 											currentTodayTasksLookUp,
 											function (_) {
 												return _.id;
-											}(_p18)));
+											}(_p22)));
 								},
 								A2(
 									_elm_lang$core$List$filter,
@@ -13887,10 +13782,10 @@
 									return {ctor: '_Tuple2', _0: task.workspace.id, _1: task.workspace};
 								},
 								_elm_lang$core$Dict$values(tasks)));
-						var _p19 = _johannth$what_to_read_next$State$initDatePickers(
+						var _p23 = _johannth$what_to_read_next$State$initDatePickers(
 							_elm_lang$core$Dict$values(tasks));
-						var datePickers = _p19._0;
-						var datePickerFx = _p19._1;
+						var datePickers = _p23._0;
+						var datePickerFx = _p23._1;
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -13904,17 +13799,17 @@
 							datePickerFx);
 					}
 				case 'SetDefaultWorkspace':
-					var _p20 = _p12._0;
+					var _p24 = _p16._0;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								defaultWorkspace: _elm_lang$core$Maybe$Just(_p20)
+								defaultWorkspace: _elm_lang$core$Maybe$Just(_p24)
 							}),
 						{
 							ctor: '::',
-							_0: A3(_johannth$what_to_read_next$LocalStorage$setItem, _johannth$what_to_read_next$State$defaultWorkspaceStorageKey, _p20, _elm_lang$core$Json_Encode$string),
+							_0: A3(_johannth$what_to_read_next$LocalStorage$setItem, _johannth$what_to_read_next$State$defaultWorkspaceStorageKey, _p24, _elm_lang$core$Json_Encode$string),
 							_1: {ctor: '[]'}
 						});
 				case 'ToggleExpanded':
@@ -13923,15 +13818,15 @@
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								expanded: A2(_johannth$what_to_read_next$State$toggleExpandedState, _p12._0, model.expanded)
+								expanded: A2(_johannth$what_to_read_next$State$toggleExpandedState, _p16._0, model.expanded)
 							}),
 						{ctor: '[]'});
 				case 'CompleteTask':
-					var _p21 = A2(_elm_lang$core$Dict$get, _p12._0, model.tasks);
-					if (_p21.ctor === 'Just') {
-						var _p22 = _p21._0;
+					var _p25 = A2(_elm_lang$core$Dict$get, _p16._0, model.tasks);
+					if (_p25.ctor === 'Just') {
+						var _p26 = _p25._0;
 						var updatedTask = _elm_lang$core$Native_Utils.update(
-							_p22,
+							_p26,
 							{completed: true});
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
@@ -13942,7 +13837,7 @@
 								}),
 							{
 								ctor: '::',
-								_0: A4(_johannth$what_to_read_next$Api$updateTask, model.apiHost, model.accessTokens, _p22, _johannth$what_to_read_next$Types$Complete),
+								_0: A4(_johannth$what_to_read_next$Api$updateTask, model.apiHost, model.accessTokens, _p26, _johannth$what_to_read_next$Types$Complete),
 								_1: {ctor: '[]'}
 							});
 					} else {
@@ -13952,18 +13847,18 @@
 							{ctor: '[]'});
 					}
 				case 'EditTaskName':
-					var _p24 = _p12._0;
-					var _p23 = A2(_elm_lang$core$Dict$get, _p24, model.tasks);
-					if (_p23.ctor === 'Just') {
+					var _p28 = _p16._0;
+					var _p27 = A2(_elm_lang$core$Dict$get, _p28, model.tasks);
+					if (_p27.ctor === 'Just') {
 						var updatedTask = _elm_lang$core$Native_Utils.update(
-							_p23._0,
-							{name: _p12._1});
+							_p27._0,
+							{name: _p16._1});
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									tasks: A3(_elm_lang$core$Dict$insert, _p24, updatedTask, model.tasks)
+									tasks: A3(_elm_lang$core$Dict$insert, _p28, updatedTask, model.tasks)
 								}),
 							{ctor: '[]'});
 					} else {
@@ -13973,15 +13868,15 @@
 							{ctor: '[]'});
 					}
 				case 'StopEditTaskName':
-					var _p25 = A2(_elm_lang$core$Dict$get, _p12._0, model.tasks);
-					if (_p25.ctor === 'Just') {
-						var _p26 = _p25._0;
-						var command = A2(_elm_lang$core$String$startsWith, 'local-', _p26.id) ? A3(_johannth$what_to_read_next$Api$createTask, model.apiHost, model.accessTokens, _p26) : A4(
+					var _p29 = A2(_elm_lang$core$Dict$get, _p16._0, model.tasks);
+					if (_p29.ctor === 'Just') {
+						var _p30 = _p29._0;
+						var command = A2(_elm_lang$core$String$startsWith, 'local-', _p30.id) ? A3(_johannth$what_to_read_next$Api$createTask, model.apiHost, model.accessTokens, _p30) : A4(
 							_johannth$what_to_read_next$Api$updateTask,
 							model.apiHost,
 							model.accessTokens,
-							_p26,
-							_johannth$what_to_read_next$Types$UpdateName(_p26.name));
+							_p30,
+							_johannth$what_to_read_next$Types$UpdateName(_p30.name));
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							model,
@@ -13997,17 +13892,17 @@
 							{ctor: '[]'});
 					}
 				case 'AddNewTask':
-					var _p29 = _p12._0;
-					var _p27 = A2(
+					var _p33 = _p16._0;
+					var _p31 = A2(
 						_elm_lang$core$Maybe$andThen,
 						function (workspaceId) {
 							return A2(_elm_lang$core$Dict$get, workspaceId, model.workspaces);
 						},
 						model.defaultWorkspace);
-					if (_p27.ctor === 'Just') {
-						var _p28 = _elm_community$elm_datepicker$DatePicker$init(_elm_community$elm_datepicker$DatePicker$defaultSettings);
-						var datePicker = _p28._0;
-						var datePickerFx = _p28._1;
+					if (_p31.ctor === 'Just') {
+						var _p32 = _elm_community$elm_datepicker$DatePicker$init(_elm_community$elm_datepicker$DatePicker$defaultSettings);
+						var datePicker = _p32._0;
+						var datePickerFx = _p32._1;
 						var localId = A2(
 							_elm_lang$core$Basics_ops['++'],
 							'local-',
@@ -14017,16 +13912,16 @@
 							_johannth$what_to_read_next$Types$AsanaTask,
 							localId,
 							'',
-							_p29,
+							_p33,
 							{ctor: '[]'},
-							_p27._0,
+							_p31._0,
 							'',
 							_elm_lang$core$Maybe$Nothing,
 							false);
 						var taskList = A3(
 							_johannth$what_to_read_next$State$moveTaskInTaskList,
 							A2(_johannth$what_to_read_next$Types$DragTarget, task.assigneeStatus, task.id),
-							A2(_johannth$what_to_read_next$Types$After, _p29, _p12._1),
+							A2(_johannth$what_to_read_next$Types$After, _p33, _p16._1),
 							model.taskList);
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
@@ -14060,44 +13955,44 @@
 							{ctor: '[]'});
 					}
 				case 'ToDatePicker':
-					var _p36 = _p12._0;
-					var _p30 = {
+					var _p40 = _p16._0;
+					var _p34 = {
 						ctor: '_Tuple2',
-						_0: A2(_elm_lang$core$Dict$get, _p36, model.datePickers),
-						_1: A2(_elm_lang$core$Dict$get, _p36, model.tasks)
+						_0: A2(_elm_lang$core$Dict$get, _p40, model.datePickers),
+						_1: A2(_elm_lang$core$Dict$get, _p40, model.tasks)
 					};
-					if (((_p30.ctor === '_Tuple2') && (_p30._0.ctor === 'Just')) && (_p30._1.ctor === 'Just')) {
-						var _p35 = _p30._1._0;
-						var _p31 = A2(_elm_community$elm_datepicker$DatePicker$update, _p12._1, _p30._0._0);
-						var newDatePicker = _p31._0;
-						var datePickerFx = _p31._1;
-						var maybeDate = _p31._2;
-						var datePickers = A3(_elm_lang$core$Dict$insert, _p36, newDatePicker, model.datePickers);
-						var _p32 = function () {
-							var _p33 = maybeDate;
-							if (_p33.ctor === 'Just') {
-								var _p34 = _p33._0;
+					if (((_p34.ctor === '_Tuple2') && (_p34._0.ctor === 'Just')) && (_p34._1.ctor === 'Just')) {
+						var _p39 = _p34._1._0;
+						var _p35 = A2(_elm_community$elm_datepicker$DatePicker$update, _p16._1, _p34._0._0);
+						var newDatePicker = _p35._0;
+						var datePickerFx = _p35._1;
+						var maybeDate = _p35._2;
+						var datePickers = A3(_elm_lang$core$Dict$insert, _p40, newDatePicker, model.datePickers);
+						var _p36 = function () {
+							var _p37 = maybeDate;
+							if (_p37.ctor === 'Just') {
+								var _p38 = _p37._0;
 								return {
 									ctor: '_Tuple2',
 									_0: _elm_lang$core$Native_Utils.update(
-										_p35,
+										_p39,
 										{
-											dueOn: _elm_lang$core$Maybe$Just(_p34)
+											dueOn: _elm_lang$core$Maybe$Just(_p38)
 										}),
 									_1: A4(
 										_johannth$what_to_read_next$Api$updateTask,
 										model.apiHost,
 										model.accessTokens,
-										_p35,
-										_johannth$what_to_read_next$Types$UpdateDueOn(_p34))
+										_p39,
+										_johannth$what_to_read_next$Types$UpdateDueOn(_p38))
 								};
 							} else {
-								return {ctor: '_Tuple2', _0: _p35, _1: _elm_lang$core$Platform_Cmd$none};
+								return {ctor: '_Tuple2', _0: _p39, _1: _elm_lang$core$Platform_Cmd$none};
 							}
 						}();
-						var updatedTask = _p32._0;
-						var command = _p32._1;
-						var tasks = A3(_elm_lang$core$Dict$insert, _p36, updatedTask, model.tasks);
+						var updatedTask = _p36._0;
+						var command = _p36._1;
+						var tasks = A3(_elm_lang$core$Dict$insert, _p40, updatedTask, model.tasks);
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							_elm_lang$core$Native_Utils.update(
@@ -14107,7 +14002,7 @@
 								ctor: '::',
 								_0: A2(
 									_elm_lang$core$Platform_Cmd$map,
-									_johannth$what_to_read_next$Types$ToDatePicker(_p36),
+									_johannth$what_to_read_next$Types$ToDatePicker(_p40),
 									datePickerFx),
 								_1: {
 									ctor: '::',
@@ -14122,22 +14017,22 @@
 							{ctor: '[]'});
 					}
 				case 'TaskCreated':
-					if (_p12._1.ctor === 'Err') {
+					if (_p16._1.ctor === 'Err') {
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
 							model,
 							{ctor: '[]'});
 					} else {
-						var _p39 = _p12._1._0;
-						var _p38 = _p12._0;
+						var _p43 = _p16._1._0;
+						var _p42 = _p16._0;
 						var datePickers = function () {
-							var _p37 = A2(_elm_lang$core$Dict$get, _p38, model.datePickers);
-							if (_p37.ctor === 'Just') {
+							var _p41 = A2(_elm_lang$core$Dict$get, _p42, model.datePickers);
+							if (_p41.ctor === 'Just') {
 								return A3(
 									_elm_lang$core$Dict$insert,
-									_p39.id,
-									_p37._0,
-									A2(_elm_lang$core$Dict$remove, _p38, model.datePickers));
+									_p43.id,
+									_p41._0,
+									A2(_elm_lang$core$Dict$remove, _p42, model.datePickers));
 							} else {
 								return model.datePickers;
 							}
@@ -14148,11 +14043,11 @@
 								_johannth$what_to_read_next$State$updateTaskList,
 								_elm_lang$core$List$map(
 									function (taskId) {
-										return _elm_lang$core$Native_Utils.eq(taskId, _p38) ? _p39.id : taskId;
+										return _elm_lang$core$Native_Utils.eq(taskId, _p42) ? _p43.id : taskId;
 									}),
-								_p39.assigneeStatus),
+								_p43.assigneeStatus),
 							model.taskList);
-						var tasks = A3(_elm_lang$core$Dict$insert, _p39.id, _p39, model.tasks);
+						var tasks = A3(_elm_lang$core$Dict$insert, _p43.id, _p43, model.tasks);
 						var updatedModel = _elm_lang$core$Native_Utils.update(
 							model,
 							{tasks: tasks, taskList: taskList, datePickers: datePickers});
@@ -14171,28 +14066,28 @@
 						model,
 						{ctor: '[]'});
 				case 'DragDropMsg':
-					var _p40 = A2(_norpan$elm_html5_drag_drop$Html5_DragDrop$update, _p12._0, model.dragDrop);
-					var dragDrop = _p40._0;
-					var result = _p40._1;
-					var _p41 = function () {
-						var _p42 = result;
-						if (_p42.ctor === 'Just') {
-							var _p45 = _p42._0._1;
-							var _p44 = _p42._0._0;
-							var newAssigneeStatus = _johannth$what_to_read_next$Types$assigneeStatusFromDropTarget(_p45);
-							var _p43 = A2(_elm_lang$core$Dict$get, _p44.targetId, model.tasks);
-							if (_p43.ctor === 'Just') {
+					var _p44 = A2(_norpan$elm_html5_drag_drop$Html5_DragDrop$update, _p16._0, model.dragDrop);
+					var dragDrop = _p44._0;
+					var result = _p44._1;
+					var _p45 = function () {
+						var _p46 = result;
+						if (_p46.ctor === 'Just') {
+							var _p49 = _p46._0._1;
+							var _p48 = _p46._0._0;
+							var newAssigneeStatus = _johannth$what_to_read_next$Types$assigneeStatusFromDropTarget(_p49);
+							var _p47 = A2(_elm_lang$core$Dict$get, _p48.targetId, model.tasks);
+							if (_p47.ctor === 'Just') {
 								return {
 									ctor: '_Tuple3',
-									_0: A3(_johannth$what_to_read_next$State$moveTaskInTaskList, _p44, _p45, model.taskList),
-									_1: A3(_johannth$what_to_read_next$State$updateAssigneeStatus, _p44.targetId, newAssigneeStatus, model.tasks),
+									_0: A3(_johannth$what_to_read_next$State$moveTaskInTaskList, _p48, _p49, model.taskList),
+									_1: A3(_johannth$what_to_read_next$State$updateAssigneeStatus, _p48.targetId, newAssigneeStatus, model.tasks),
 									_2: {
 										ctor: '::',
 										_0: A4(
 											_johannth$what_to_read_next$Api$updateTask,
 											model.apiHost,
 											model.accessTokens,
-											_p43._0,
+											_p47._0,
 											_johannth$what_to_read_next$Types$UpdateAssigneeStatus(newAssigneeStatus)),
 										_1: {ctor: '[]'}
 									}
@@ -14214,9 +14109,9 @@
 							};
 						}
 					}();
-					var taskList = _p41._0;
-					var tasks = _p41._1;
-					var commands = _p41._2;
+					var taskList = _p45._0;
+					var tasks = _p45._1;
+					var commands = _p45._2;
 					var updatedModel = _elm_lang$core$Native_Utils.update(
 						model,
 						{dragDrop: dragDrop, taskList: taskList, tasks: tasks});
@@ -14232,7 +14127,7 @@
 								_1: {ctor: '[]'}
 							}));
 				case 'ToggleAssigneeStatusOverlay':
-					var _p46 = _p12._0;
+					var _p50 = _p16._0;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
@@ -14240,27 +14135,27 @@
 							{
 								expandedAssigneeStatusOverlay: _elm_lang$core$Native_Utils.eq(
 									model.expandedAssigneeStatusOverlay,
-									_elm_lang$core$Maybe$Just(_p46)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p46)
+									_elm_lang$core$Maybe$Just(_p50)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(_p50)
 							}),
 						{ctor: '[]'});
 				default:
-					var _p50 = _p12._0;
-					var _p49 = _p12._1;
-					var _p47 = A2(_elm_lang$core$Dict$get, _p50, model.tasks);
-					if (_p47.ctor === 'Just') {
-						var _p48 = _p47._0;
+					var _p54 = _p16._0;
+					var _p53 = _p16._1;
+					var _p51 = A2(_elm_lang$core$Dict$get, _p54, model.tasks);
+					if (_p51.ctor === 'Just') {
+						var _p52 = _p51._0;
 						var taskList = A3(
 							_johannth$what_to_read_next$State$moveTaskInTaskList,
-							A2(_johannth$what_to_read_next$Types$DragTarget, _p48.assigneeStatus, _p48.id),
-							_johannth$what_to_read_next$Types$End(_p49),
+							A2(_johannth$what_to_read_next$Types$DragTarget, _p52.assigneeStatus, _p52.id),
+							_johannth$what_to_read_next$Types$End(_p53),
 							model.taskList);
 						var updatedTask = _elm_lang$core$Native_Utils.update(
-							_p48,
-							{assigneeStatus: _p49});
+							_p52,
+							{assigneeStatus: _p53});
 						var updatedModel = _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								tasks: A3(_elm_lang$core$Dict$insert, _p50, updatedTask, model.tasks),
+								tasks: A3(_elm_lang$core$Dict$insert, _p54, updatedTask, model.tasks),
 								taskList: taskList,
 								expandedAssigneeStatusOverlay: _elm_lang$core$Maybe$Nothing
 							});
@@ -14273,8 +14168,8 @@
 									_johannth$what_to_read_next$Api$updateTask,
 									model.apiHost,
 									model.accessTokens,
-									_p48,
-									_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p49)),
+									_p52,
+									_johannth$what_to_read_next$Types$UpdateAssigneeStatus(_p53)),
 								_1: {
 									ctor: '::',
 									_0: _johannth$what_to_read_next$State$saveTaskList(updatedModel.taskList),
@@ -15621,8 +15516,8 @@
 	var mountNode = document.getElementById('app');
 	var app = Elm.Main.embed(mountNode, {
 	  today: Date.now(),
-	  buildVersion: ("0292c7adb6fefeb210878a064afcada9c8770a98\n"),
-	  buildTime: ("2017-04-25T18:43:47.197Z"),
+	  buildVersion: ("446879094014bc7e1b371c73b5f1846b998d4a3a\n"),
+	  buildTime: ("2017-04-25T22:29:25.128Z"),
 	  buildTier: ("production"),
 	  apiHost: ("https://asana-inbox.herokuapp.com"),
 	});
