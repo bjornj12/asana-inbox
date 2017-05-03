@@ -14780,7 +14780,7 @@
 									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text(task.name),
+										_0: A3(_johannth$what_to_read_next$View$taskTitleView, task.id, task.assigneeStatus, task.name),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -15516,8 +15516,8 @@
 	var mountNode = document.getElementById('app');
 	var app = Elm.Main.embed(mountNode, {
 	  today: Date.now(),
-	  buildVersion: ("1b374090d40401293b95f24d2df97ccb608737c2\n"),
-	  buildTime: ("2017-04-26T09:23:49.232Z"),
+	  buildVersion: ("dd4729953474e04d29e24ced2b60c30108a9cd24\n"),
+	  buildTime: ("2017-05-03T10:20:44.428Z"),
 	  buildTier: ("production"),
 	  apiHost: ("https://asana-inbox.herokuapp.com"),
 	});
